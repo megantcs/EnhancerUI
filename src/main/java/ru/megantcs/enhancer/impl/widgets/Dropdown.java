@@ -1,16 +1,18 @@
-package ru.megantcs.enhancer.platform.render.engine.widgets;
-
-import ru.megantcs.enhancer.platform.interfaces.Minecraft;
-import ru.megantcs.enhancer.platform.render.api.Graphics.GraphicsContext;
-import ru.megantcs.enhancer.platform.render.engine.render.RenderObject;
-import ru.megantcs.enhancer.platform.toolkit.Colors.Brush;
-import ru.megantcs.enhancer.platform.toolkit.utils.Debug;
+package ru.megantcs.enhancer.impl.widgets;
+import ru.megantcs.enhancer.api.graphics.GraphicsMath;
+import ru.megantcs.enhancer.api.widget.Widget;
+import ru.megantcs.enhancer.api.widget.styles.StyleDrawRect;
+import ru.megantcs.enhancer.api.widget.styles.StyleDrawText;
+import ru.megantcs.enhancer.impl.core.RenderObject;
+import ru.megantcs.enhancer.platform.toolkit.colors.Brush;
+import ru.megantcs.enhancer.platform.toolkit.events.EventFactory;
+import ru.megantcs.enhancer.platform.toolkit.events.impl.ActionEvent;
 
 import java.awt.*;
 import java.util.*;
 import java.util.List;
 
-public class ComboBox extends WidgetCore
+public class ComboBox extends Widget
 {
     final Set<String> options;
     final String title;
@@ -20,8 +22,13 @@ public class ComboBox extends WidgetCore
     private boolean dropdown = false;
     private float itemHeight = 20f;
 
+    public ActionEvent<String> OnSelectedItem = EventFactory.makeActionEvent();
+
     public ComboBox(String title, Set<String> options) {
         super(1, 15);
+        Objects.requireNonNull(title);
+        Objects.requireNonNull(options);
+
         this.options = options;
         this.title = title;
 
@@ -36,21 +43,22 @@ public class ComboBox extends WidgetCore
             this.selected = items.get(0).getTitle();
             items.get(0).setSelected(true);
         }
+
+        setSize(getWidthForOptions(title, options) + 40, 15);
     }
 
-    @Override
-    protected void setup(RenderObject renderObject)
-    {
-        setSize(getWidthForOptions(title, options, renderObject) + 40, 15);
+    public ComboBox(String title, String... options) {
+        this(title, new HashSet<>(List.of(options)));
     }
 
-    private int getWidthForOptions(String title, Set<String> options, RenderObject renderObject) {
-        int maxWidth = getWidthStr(renderObject, title);
+
+    private int getWidthForOptions(String title, Set<String> options) {
+        var maxWidth = getWidthText(title);
         for (String option : options) {
-            int width = getWidthStr(renderObject, option);
+            var width = getWidthText(option);
             if (width > maxWidth) maxWidth = width;
         }
-        return maxWidth + 40;
+        return (int)maxWidth + 40;
     }
 
     private void updateItemsPositions() {
@@ -63,12 +71,17 @@ public class ComboBox extends WidgetCore
             ComboBoxItem item = items.get(i);
             float itemY = startY + (i * itemHeight);
 
+            var title = item.title;
+            var textWidth = getWidthText(title);
+            var textX = (getWidth() - textWidth) / 2;
+            var textY = (item.height - getFont().getHeightLine()) / 2 + 3;
+
             item.updatePosition(
                     startX,
                     itemY,
                     getWidth(),
                     itemHeight,
-                    getWidth()
+                    textX, textY
             );
         }
     }
@@ -77,7 +90,7 @@ public class ComboBox extends WidgetCore
     protected void renderBackground(RenderObject renderObject)
     {
         drawRect(renderObject, getX(), getY(), getZIndex() - 1, getWidth(),
-                 getHeight(), getCornerRadius(), getCurrentBackgroundColor());
+                 getHeight(), getCurrentBackgroundColor());
     }
 
     @Override
@@ -88,14 +101,11 @@ public class ComboBox extends WidgetCore
         }
 
         String displayText = (selected != null && !selected.equals(title)) ? selected : title;
-
-        int textWidth = Minecraft.mc.textRenderer.getWidth(displayText);
-        float textX = getX() + (getWidth() - textWidth) / 2;
-        float textY = getY() + (getHeight() - 9) / 2 + 1;
-
         Color textColor = isEnabled() ? Color.white : Color.gray;
 
-        drawText(renderObject, textX, textY, displayText, Brush.of(textColor));
+        var pos = calcCenterText(displayText);
+
+        drawText(renderObject, pos.x, pos.y, zIndex + 1, displayText, Brush.of(textColor));
 
         if (dropdown) {
             renderDropdown(renderObject, mouseX, mouseY);
@@ -105,7 +115,7 @@ public class ComboBox extends WidgetCore
         float arrowX = getX() + getWidth() - 20;
         float arrowY = getY() + (getHeight() - 9) / 2 + 1;
 
-        drawText(renderObject, arrowX, arrowY, arrow, Brush.of(textColor));
+        drawText(renderObject, arrowX, arrowY, zIndex + 1, arrow, Brush.of(textColor));
     }
 
     private void renderDropdown(RenderObject renderObject, int mouseX, int mouseY) {
@@ -118,7 +128,7 @@ public class ComboBox extends WidgetCore
                     getZIndex() + 10,
                     getCornerRadius(),
                     isEnabled(),
-                    getBackgroundColor()
+                    getBackgroundColor().first()
             );
         }
     }
@@ -130,8 +140,30 @@ public class ComboBox extends WidgetCore
         }
     }
 
+    public boolean isHoverAll(double mouseX, double mouseY) {
+        if(dropdown) {
+            for (ComboBoxItem item : items)
+            {
+                var t = GraphicsMath.isHovered(mouseX, mouseY, item.x, item.y, item.width, item.height);
+                if(t)
+                {
+                    return true;
+                }
+            }
+        }
+        else {
+            return isMouseOver((int) mouseX, (int) mouseY);
+        }
+
+        return false;
+    }
+
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        if(!isHoverAll(mouseX, mouseY)) {
+            dropdown = false;
+            return false;
+        }
         boolean result = super.mouseClicked(mouseX, mouseY, button);
 
         boolean clickedOnMainButton = mouseX >= getX() && mouseX <= getX() + getWidth() &&
@@ -179,6 +211,8 @@ public class ComboBox extends WidgetCore
         }
 
         selectedItem.setSelected(true);
+
+        OnSelectedItem.invoker().invoke(selectedItem.title);
         this.selected = selectedItem.getTitle();
     }
 
@@ -283,15 +317,13 @@ public class ComboBox extends WidgetCore
             this.title = title;
         }
 
-        public void updatePosition(float x, float y, float width, float height, float parentWidth) {
+        public void updatePosition(float x, float y, float width, float height, float textX, float textY) {
             this.x = x;
             this.y = y;
             this.width = width;
             this.height = height;
-
-            int textWidth = Minecraft.mc.textRenderer.getWidth(title);
-            this.textX = x + (parentWidth - textWidth) / 2;
-            this.textY = y + (height - 9) / 2 + 1;
+            this.textX = textX + x;
+            this.textY = textY + y;
         }
 
         public String getTitle() {
@@ -331,7 +363,7 @@ public class ComboBox extends WidgetCore
         }
 
         public boolean isHovered(int mouseX, int mouseY) {
-            return GraphicsContext.isHovered(mouseX, mouseY, x, y, width, height);
+            return GraphicsMath.isHovered(mouseX, mouseY, x, y, width, height);
         }
 
         public void render(RenderObject renderObject, StyleDrawRect drawElement, StyleDrawText drawText, int zIndex, float cornerRadius,
@@ -355,7 +387,8 @@ public class ComboBox extends WidgetCore
                 itemBgColor = parentColor;
             }
 
-            drawElement.drawRect(renderObject, x, y, zIndex, width, height, cornerRadius, Brush.of(itemBgColor));
+            // fix zIndex for custom font renderer
+            drawElement.drawRect(renderObject, x, y, zIndex-6, width, height, Brush.of(itemBgColor));
 
             Color itemTextColor;
             if (!enabled) {
@@ -368,7 +401,7 @@ public class ComboBox extends WidgetCore
                 itemTextColor = Color.white;
             }
 
-            drawText.drawText(renderObject, textX, textY, title, Brush.of(itemTextColor));
+            drawText.drawText(renderObject, textX, textY, zIndex + 1, title, Brush.of(itemTextColor));
         }
     }
 }

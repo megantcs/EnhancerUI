@@ -1,13 +1,14 @@
 package ru.megantcs.enhancer.impl.widgets;
 
+import ru.megantcs.enhancer.api.widget.Widget;
 import ru.megantcs.enhancer.impl.core.RenderObject;
 
-public class Button extends Widget
+public class TextButton extends Widget
 {
     private final String content;
     private final Runnable action;
 
-    public Button(String content, Runnable action) {
+    public TextButton(String content, Runnable action) {
         super(0, 20);
         this.content = content;
         this.action = action;
@@ -25,7 +26,7 @@ public class Button extends Widget
     protected void renderContent(RenderObject renderObject, int mouseX, int mouseY, float delta)
     {
         var pos = calcCenterText(content);
-        drawText(renderObject, pos.x, pos.y, content, getCurrentTextColor());
+        drawText(renderObject, pos.x, pos.y, zIndex + 1, content, getCurrentTextColor());
     }
 
     @Override
