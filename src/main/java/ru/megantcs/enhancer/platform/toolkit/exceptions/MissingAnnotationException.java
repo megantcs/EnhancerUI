@@ -1,4 +1,4 @@
-package ru.megantcs.enhancer.impl.core.exceptions;
+package ru.megantcs.enhancer.api.core.exceptions;
 
 public class MissingAnnotationException extends RuntimeException {
     public MissingAnnotationException(String message) {
