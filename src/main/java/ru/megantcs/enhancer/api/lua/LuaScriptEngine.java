@@ -6,18 +6,18 @@ import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.JsePlatform;
-import ru.megantcs.enhancer.platform.toolkit.exceptions.ExceptionContainer;
+import ru.megantcs.enhancer.platform.toolkit.exceptions.container.api.ExceptionContainer;
 
 import java.util.Objects;
 
-public class LuaEnvironment
+public class LuaSandbox
 {
     final ExceptionContainer exceptionContainer;
-    private final Globals globals;
+    private Globals globals;
 
-    public LuaEnvironment(ExceptionContainer exceptionContainer) {
+    public LuaSandbox(ExceptionContainer exceptionContainer) {
         this.exceptionContainer = Objects.requireNonNull(exceptionContainer);
-        this.globals = JsePlatform.standardGlobals();
+        reloadEnvironment();
     }
 
     public boolean setTable(@Nullable String name, @Nullable LuaTable table)
@@ -26,6 +26,10 @@ public class LuaEnvironment
 
         globals.set(name, table);
         return true;
+    }
+
+    public void reloadEnvironment() {
+        globals = JsePlatform.standardGlobals();
     }
 
     public boolean loadScript(String code, String name)
@@ -39,7 +43,7 @@ public class LuaEnvironment
 
             return true;
         } catch (Exception e) {
-            exceptionContainer.add(LuaEnvironment.class, e);
+            exceptionContainer.add(LuaSandbox.class, e);
         }
         return false;
     }
