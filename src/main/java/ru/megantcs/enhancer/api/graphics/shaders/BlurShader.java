@@ -1,23 +1,21 @@
-package ru.megantcs.enhancer.platform.render.api.Shaders;
+package ru.megantcs.enhancer.api.graphics.shaders;
 import com.mojang.blaze3d.systems.RenderSystem;
+
 import ladysnake.satin.api.managed.ManagedCoreShader;
 import ladysnake.satin.api.managed.ShaderEffectManager;
 import ladysnake.satin.api.managed.uniform.SamplerUniform;
-import ladysnake.satin.api.managed.uniform.Uniform1f;
-import ladysnake.satin.api.managed.uniform.Uniform2f;
-import ladysnake.satin.api.managed.uniform.Uniform4f;
+import ladysnake.satin.api.managed.uniform.*;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.gl.SimpleFramebuffer;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.util.Identifier;
 import org.lwjgl.opengl.GL30;
-import ru.megantcs.enhancer.platform.interfaces.Minecraft;
-import ru.megantcs.enhancer.platform.toolkit.Callbacks.WindowResizeCallback;
+import ru.megantcs.enhancer.api.graphics.WindowResizeCallback;
 
 import java.awt.*;
 
-public class BlurShader implements Minecraft
+public class BlurShader
 {
     private Uniform2f uSize;
     private Uniform2f uLocation;
@@ -29,9 +27,10 @@ public class BlurShader implements Minecraft
     private SamplerUniform sampler;
 
     private Framebuffer input;
+    private MinecraftClient mc = MinecraftClient.getInstance();
 
     public static final ManagedCoreShader BLUR = ShaderEffectManager.getInstance()
-            .manageCoreShader(Identifier.of("enchancer", "blur"), VertexFormats.POSITION);
+            .manageCoreShader(Identifier.of("enhancer", "blur"), VertexFormats.POSITION);
 
     public BlurShader() {
         setup();

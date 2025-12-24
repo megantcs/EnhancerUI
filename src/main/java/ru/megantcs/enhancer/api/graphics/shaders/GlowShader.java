@@ -12,7 +12,7 @@ import net.minecraft.util.Identifier;
 
 import java.awt.*;
 
-public class EffectShader
+public class GlowShader
 {
     private Uniform2f uSize;
     private Uniform2f uLocation;
@@ -29,13 +29,13 @@ public class EffectShader
     private MinecraftClient mc = MinecraftClient.getInstance();
 
     public static final ManagedCoreShader HUD_SHADER = ShaderEffectManager.getInstance()
-            .manageCoreShader(Identifier.of("enchancer", "hudshader"), VertexFormats.POSITION);
+            .manageCoreShader(Identifier.of("enhancer", "glow"), VertexFormats.POSITION);
 
-    public EffectShader() {
+    public GlowShader() {
         setup();
     }
 
-    public void setParameters(float x, float y, float width, float height, float r, float externalAlpha, float internalAlpha, Color c1, Color c2, Color c3, Color c4) {
+    public void setParameters(float x, float y, float width, float height, float r, float externalAlpha, float sGlow, float sOutline, float internalAlpha, Color c1, Color c2, Color c3, Color c4) {
         float i = (float) mc.getWindow().getScaleFactor();
         radius.set(r * i);
         uLocation.set(x * i, -y * i + mc.getWindow().getScaledHeight() * i - height * i);
@@ -46,8 +46,8 @@ public class EffectShader
         color3.set(c3.getRed() / 255f, c3.getGreen() / 255f, c3.getBlue() / 255f, externalAlpha);
         color4.set(c4.getRed() / 255f, c4.getGreen() / 255f, c4.getBlue() / 255f, externalAlpha);
         blend.set(1);
-        outline.set(1);
-        glow.set(1);
+        outline.set(sOutline);
+        glow.set(sGlow);
         alpha.set(internalAlpha);
     }
 

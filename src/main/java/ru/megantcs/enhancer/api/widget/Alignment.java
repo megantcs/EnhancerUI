@@ -1,4 +1,9 @@
 package ru.megantcs.enhancer.api.widget;
 
-public class Aligment {
+public enum Alignment
+{
+    START,
+    CENTER,
+    END,
+    STRETCH
 }

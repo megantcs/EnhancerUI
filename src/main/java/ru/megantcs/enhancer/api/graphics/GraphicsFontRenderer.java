@@ -19,6 +19,7 @@ import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.Closeable;
 import java.util.List;
 import java.util.Random;
@@ -29,7 +30,7 @@ import java.util.concurrent.Future;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class FontRenderer implements Closeable {
+public class GraphicsFontRenderer implements Closeable, FontRenderer {
     public static MinecraftClient mc = MinecraftClient.getInstance();
 
     private static final Char2IntArrayMap colorCodes = new Char2IntArrayMap() {{
@@ -64,8 +65,9 @@ public class FontRenderer implements Closeable {
     private int previousGameScale = -1;
     private Future<Void> prebakeGlyphsFuture;
     private boolean initialized;
+    private FontMetrics fontMetrics;
 
-    public FontRenderer(Font font, float sizePx, int charactersPerPage, int paddingBetweenCharacters, @Nullable String prebakeCharacters) {
+    public GraphicsFontRenderer(Font font, float sizePx, int charactersPerPage, int paddingBetweenCharacters, @Nullable String prebakeCharacters) {
         this.originalSize = sizePx;
         this.charsPerPage = charactersPerPage;
         this.padding = paddingBetweenCharacters;
@@ -73,7 +75,7 @@ public class FontRenderer implements Closeable {
         init(font, sizePx);
     }
 
-    public FontRenderer(Font font, float sizePx) {
+    public GraphicsFontRenderer(Font font, float sizePx) {
         this(font, sizePx, 256, 5, null);
     }
 
@@ -109,6 +111,13 @@ public class FontRenderer implements Closeable {
         this.previousGameScale = (int) mc.getWindow().getScaleFactor();
         this.scaleMul = this.previousGameScale;
         this.font = font.deriveFont(sizePx * this.scaleMul);
+
+        BufferedImage tempImage = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = tempImage.createGraphics();
+        g2d.setFont(this.font);
+        this.fontMetrics = g2d.getFontMetrics();
+        g2d.dispose();
+
         if (prebakeGlyphs != null && !prebakeGlyphs.isEmpty()) {
             prebakeGlyphsFuture = this.prebake();
         }
@@ -145,24 +154,34 @@ public class FontRenderer implements Closeable {
         return allGlyphs.computeIfAbsent(glyph, this::locateGlyph0);
     }
 
-    public void drawString(MatrixStack stack, String s, double x, double y, int color) {
+    public void drawString(MatrixStack stack, String s, double x, double y, float z, int color) {
         float r = ((color >> 16) & 0xff)/ 255f;
         float g = ((color >> 8) & 0xff) / 255f;
         float b = ((color) & 0xff) / 255f;
         float a = ((color >> 24) & 0xff) / 255f;
-        drawString(stack, s, (float) x, (float) y, r, g, b, a);
+        drawString(stack, s, (float) x, (float) y, z, r, g, b, a);
     }
 
-    public void drawString(MatrixStack stack, String s, double x, double y, Color color) {
-        drawString(stack, s, (float) x, (float) y, color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha());
+    @Override
+    public float getWidth(String text) {
+        return getStringWidth(text);
     }
 
-    public void drawString(MatrixStack stack, String s, float x, float y, float r, float g, float b, float a) {
-        drawString(stack, s, x, y, r, g, b, a, false, 0);
+    @Override
+    public float getHeight(String text) {
+        return getStringHeight(text);
     }
 
+    @Override
+    public float getHeightLine() {
+        return getLineHeight();
+    }
 
-    public void drawString(MatrixStack stack, String s, float x, float y, float r, float g, float b, float a, boolean gradient, int offset) {
+    public void drawString(MatrixStack stack, String s, float x, float y, float z, float r, float g, float b, float a) {
+        drawString(stack, s, x, y, z, r, g, b, a, false, 0);
+    }
+
+    public void drawString(MatrixStack stack, String s, float x, float y, float z, float r, float g, float b, float a, boolean gradient, int offset) {
         if (prebakeGlyphsFuture != null && !prebakeGlyphsFuture.isDone()) {
             try {
                 prebakeGlyphsFuture.get();
@@ -260,10 +279,11 @@ public class FontRenderer implements Closeable {
                     float u2 = (float) (glyph.u() + glyph.width()) / owner.width;
                     float v2 = (float) (glyph.v() + glyph.height()) / owner.height;
 
-                    bb.vertex(mat, xo + 0, yo + h, 0).texture(u1, v2).color(cr, cg, cb, a).next();
-                    bb.vertex(mat, xo + w, yo + h, 0).texture(u2, v2).color(cr, cg, cb, a).next();
-                    bb.vertex(mat, xo + w, yo + 0, 0).texture(u2, v1).color(cr, cg, cb, a).next();
-                    bb.vertex(mat, xo + 0, yo + 0, 0).texture(u1, v1).color(cr, cg, cb, a).next();
+                    z += 10;
+                    bb.vertex(mat, xo + 0, yo + h, z).texture(u1, v2).color(cr, cg, cb, a).next();
+                    bb.vertex(mat, xo + w, yo + h, z).texture(u2, v2).color(cr, cg, cb, a).next();
+                    bb.vertex(mat, xo + w, yo + 0, z).texture(u2, v1).color(cr, cg, cb, a).next();
+                    bb.vertex(mat, xo + 0, yo + 0, z).texture(u1, v1).color(cr, cg, cb, a).next();
                 }
                 BufferRenderer.drawWithGlobalProgram(bb.end());
             }
@@ -273,20 +293,20 @@ public class FontRenderer implements Closeable {
         stack.pop();
     }
 
-    public void drawCenteredString(MatrixStack stack, String s, double x, double y, int color) {
+    public void drawCenteredString(MatrixStack stack, String s, double x, double y, float z, int color) {
         float r = ((color >> 16) & 0xff) / 255f;
         float g = ((color >> 8) & 0xff) / 255f;
         float b = ((color) & 0xff) / 255f;
         float a = ((color >> 24) & 0xff) / 255f;
-        drawString(stack, s, (float) (x - getStringWidth(s) / 2f), (float) y, r, g, b, a);
+        drawString(stack, s, (float) (x - getStringWidth(s) / 2f), (float) y, z, r, g, b, a);
     }
 
-    public void drawCenteredString(MatrixStack stack, String s, double x, double y, Color color) {
-        drawString(stack, s, (float) (x - getStringWidth(s) / 2f), (float) y, color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
+    public void drawCenteredString(MatrixStack stack, String s, double x, double y, float z, Color color) {
+        drawString(stack, s, (float) (x - getStringWidth(s) / 2f), (float) y,z, color.getRed() / 255f, color.getGreen() / 255f, color.getBlue() / 255f, color.getAlpha() / 255f);
     }
 
-    public void drawCenteredString(MatrixStack stack, String s, float x, float y, float r, float g, float b, float a) {
-        drawString(stack, s, x - getStringWidth(s) / 2f, y, r, g, b, a);
+    public void drawCenteredString(MatrixStack stack, String s, float x, float y, float z, float r, float g, float b, float a) {
+        drawString(stack, s, x - getStringWidth(s) / 2f, y, z, r, g, b, a);
     }
 
     public float getStringWidth(String text) {
@@ -351,7 +371,7 @@ public class FontRenderer implements Closeable {
 
     @Contract(value = "-> new", pure = true)
     public static @NotNull Identifier randomIdentifier() {
-        return new Identifier("thunderhack", "temp/" + randomString(32));
+        return new Identifier("enhancer", "temp/" + randomString(32));
     }
 
     private static String randomString(int length) {
@@ -372,10 +392,37 @@ public class FontRenderer implements Closeable {
         return getStringHeight(str);
     }
 
-    public void drawGradientString(MatrixStack stack, String s, float x, float y, int offset) {
-        drawString(stack, s, x, y, 255, 255, 255, 255, true, offset);
+    public void drawGradientString(MatrixStack stack, String s, float x, float y,float z, int offset) {
+        drawString(stack, s, x, y, z, 255, 255, 255, 255, true, offset);
     }
 
-    record DrawEntry(float atX, float atY, float r, float g, float b, Glyph toDraw) {
+    public float getFontAscent() {
+        return fontMetrics.getAscent() / (float) scaleMul;
     }
+
+    public float getFontDescent() {
+        if (fontMetrics != null) {
+            float descent = fontMetrics.getDescent() / (float) scaleMul;
+            return descent;
+        }
+        return 2.5f;
+    }
+
+    public float getFontLeading() {
+        if (fontMetrics != null) {
+            float leading = fontMetrics.getLeading() / (float) scaleMul;
+            return leading;
+        }
+        return 1.0f;
+    }
+
+    public float getFontBaselineOffset() {
+        return 3.0f;
+    }
+
+    public float getLineHeight() {
+        return getFontAscent() + getFontDescent() + getFontLeading();
+    }
+
+    record DrawEntry(float atX, float atY, float r, float g, float b, Glyph toDraw) { }
 }

@@ -1,4 +1,4 @@
-package ru.megantcs.ImHudEditor.api.ImGui.impl;
+package ru.megantcs.enhancer.api.graphics;
 
 import imgui.ImFontAtlas;
 import imgui.ImFontConfig;

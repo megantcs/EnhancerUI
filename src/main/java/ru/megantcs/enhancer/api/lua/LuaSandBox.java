@@ -13,7 +13,6 @@ import ru.megantcs.enhancer.platform.toolkit.Warnings;
 import ru.megantcs.enhancer.platform.toolkit.events.EventFactory;
 import ru.megantcs.enhancer.platform.toolkit.events.impl.RunnableEvent;
 import ru.megantcs.enhancer.platform.toolkit.exceptions.container.api.ExceptionFactory;
-import ru.megantcs.enhancer.platform.toolkit.exceptions.container.impl.DefaultExceptionContainer;
 import ru.megantcs.enhancer.platform.toolkit.exceptions.container.api.ExceptionContainer;
 
 import java.io.IOException;
@@ -24,22 +23,22 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class LuaLoader
+public class LuaSandBox
 {
     private final List<Chunk> chunks;
     private final List<ModuleLoadData> modules;
-    private final LuaSandbox environment;
+    private final LuaScriptEngine environment;
 
     final ExceptionContainer exceptionContainer;
 
     public final RunnableEvent OnChunkLoaded = EventFactory.makeRunnableEvent();
 
-    public LuaLoader() {
+    public LuaSandBox(ExceptionContainer exceptionContainer) {
         chunks = new CopyOnWriteArrayList<>();
         modules = new CopyOnWriteArrayList<>();
 
-        exceptionContainer = ExceptionFactory.createContainer();
-        environment = new LuaSandbox(exceptionContainer);
+        this.exceptionContainer = Objects.requireNonNull(exceptionContainer);
+        environment = new LuaScriptEngine(this.exceptionContainer);
     }
 
     public void reloadEnvironment() {
@@ -213,7 +212,7 @@ public class LuaLoader
         return namespace + "@" + start;
     }
 
-    public LuaSandbox sandBox() {
+    public LuaScriptEngine sandBox() {
         return environment;
     }
 

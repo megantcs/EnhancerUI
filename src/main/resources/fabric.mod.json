@@ -16,7 +16,8 @@
 
     ],
     "main": [
-      "ru.megantcs.enhancer.Bootstrap"
+      "ru.megantcs.enhancer.Bootstrap",
+      "ru.megantcs.HudEditor.Entrypoint"
     ]
   },
   "mixins": [

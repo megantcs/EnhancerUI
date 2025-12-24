@@ -7,24 +7,26 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 
-public class FileLuaChunk extends Chunk
+public class FileChunk extends Chunk
 {
     @NotNull
     private final Path path;
 
-    public FileLuaChunk(String code, String name, String path) {
+    public FileChunk(String code, String name, String path) {
         super(code, name);
         this.path =
                 Path.of(Objects.requireNonNull(path));
     }
 
     @Override
-    public void updateValue()
+    public FileChunk updateValue()
     {
         try {
             setCode(Files.readString(path));
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
+        return this;
     }
 }

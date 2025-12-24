@@ -1,4 +1,11 @@
 package ru.megantcs.enhancer.hook;
 
-public class HotBarRenderHook {
+import ru.megantcs.enhancer.api.lua.toolkit.PosObject;
+import ru.megantcs.enhancer.platform.toolkit.events.EventFactory;
+import ru.megantcs.enhancer.platform.toolkit.events.impl.FuncEvent;
+
+public interface HotBarRenderHook
+{
+    FuncEvent<ScoreboardRenderHook.RenderInfo, Boolean> RENDER_BACKGROUND = EventFactory.makeFuncEvent(false);
+    FuncEvent<PosObject, Boolean> RENDER_SELECT_SLOT = EventFactory.makeFuncEvent(false);
 }

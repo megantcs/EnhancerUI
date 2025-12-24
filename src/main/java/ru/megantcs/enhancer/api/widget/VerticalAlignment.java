@@ -1,4 +1,8 @@
 package ru.megantcs.enhancer.api.widget;
 
-public class VerticalAlignment {
+public enum VerticalAlignment {
+    TOP,
+    CENTER,
+    BOTTOM,
+    STRETCH,
 }

@@ -1,4 +1,4 @@
-package ru.megantcs.enhancer.platform.render.api.Shaders;
+package ru.megantcs.enhancer.api.graphics.shaders;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import ladysnake.satin.api.managed.ManagedCoreShader;
@@ -6,13 +6,15 @@ import ladysnake.satin.api.managed.ShaderEffectManager;
 import ladysnake.satin.api.managed.uniform.Uniform1f;
 import ladysnake.satin.api.managed.uniform.Uniform2f;
 import ladysnake.satin.api.managed.uniform.Uniform4f;
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexFormats;
 import net.minecraft.util.Identifier;
-import ru.megantcs.enhancer.platform.interfaces.Minecraft;
+import org.slf4j.LoggerFactory;
+
 
 import java.awt.*;
 
-public class RectangleShader implements Minecraft
+public class RectangleShader
 {
     private Uniform2f uSize;
     private Uniform2f uLocation;
@@ -23,14 +25,17 @@ public class RectangleShader implements Minecraft
     private Uniform4f color4;
 
     public static final ManagedCoreShader RECTANGLE_SHADER = ShaderEffectManager.getInstance()
-            .manageCoreShader(Identifier.of("enchancer", "rectangle"), VertexFormats.POSITION);
+            .manageCoreShader(Identifier.of("enhancer", "rectangle"), VertexFormats.POSITION);
 
     public RectangleShader() {
         setup();
     }
 
     public void setParameters(float x, float y, float width, float height, float r, float alpha, Color c1, Color c2, Color c3, Color c4) {
+        MinecraftClient mc = MinecraftClient.getInstance();
         int i = mc.options.getGuiScale().getValue();
+        if(i == 0) i = 4;
+
         radius.set(r * i);
         uLocation.set(x * i, -y * i + mc.getWindow().getScaledHeight() * i - height * i);
         uSize.set(width * i, height * i);

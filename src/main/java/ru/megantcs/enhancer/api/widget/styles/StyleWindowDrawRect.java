@@ -1,4 +1,10 @@
 package ru.megantcs.enhancer.api.widget.styles;
 
-public class StyleWindowDrawRect {
+import ru.megantcs.enhancer.impl.core.RenderObject;
+import ru.megantcs.enhancer.platform.toolkit.colors.Brush;
+
+@FunctionalInterface
+public interface StyleWindowDrawRect
+{
+    void drawWindowRect(RenderObject renderObject, float x, float y, float z, float width, float height, Brush brush);
 }

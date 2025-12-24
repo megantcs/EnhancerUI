@@ -3,12 +3,12 @@ package ru.megantcs.enhancer.impl.widgets;
 import ru.megantcs.enhancer.api.widget.Widget;
 import ru.megantcs.enhancer.impl.core.RenderObject;
 
-public class TextButton extends Widget
+public class Button extends Widget
 {
     private final String content;
     private final Runnable action;
 
-    public TextButton(String content, Runnable action) {
+    public Button(String content, Runnable action) {
         super(0, 20);
         this.content = content;
         this.action = action;

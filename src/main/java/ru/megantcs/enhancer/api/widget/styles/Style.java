@@ -1,6 +1,9 @@
-package ru.megantcs.enhancer.platform.render.engine.widgets;
-import ru.megantcs.enhancer.platform.render.engine.render.RenderObject;
-import ru.megantcs.enhancer.platform.toolkit.Colors.Brush;
+package ru.megantcs.enhancer.api.widget.styles;
+
+
+import ru.megantcs.enhancer.api.graphics.FontRenderer;
+import ru.megantcs.enhancer.impl.core.RenderObject;
+import ru.megantcs.enhancer.platform.toolkit.colors.Brush;
 
 import java.awt.*;
 
@@ -13,10 +16,19 @@ public abstract class Style {
     protected Brush disabledColor = new Brush(new Color(30, 30, 30, 150));
     protected Brush disabledTextColor = new Brush(new Color(150, 150, 150, 200));
     protected Brush focusBorderColor = new Brush(new Color(100, 150, 255, 255));
-
+    protected Brush gridColor = new Brush(new Color(25, 25, 25, 255));
     protected float borderWidth = 1f;
     protected float cornerRadius = 3f;
     protected float padding = 5f;
+    protected FontRenderer font;
+
+    public Brush getGridColor() {
+        return gridColor;
+    }
+
+    public void setGridColor(Brush gridColor) {
+        this.gridColor = gridColor;
+    }
 
     public Brush getBackgroundColor() { return backgroundColor; }
     public Brush getBorderColor() { return borderColor; }
@@ -26,6 +38,14 @@ public abstract class Style {
     public Brush getDisabledColor() { return disabledColor; }
     public Brush getDisabledTextColor() { return disabledTextColor; }
     public Brush getFocusBorderColor() { return focusBorderColor; }
+
+    public FontRenderer getFont() {
+        return font;
+    }
+
+    public void setFont(FontRenderer font) {
+        this.font = font;
+    }
 
     public float getBorderWidth() { return borderWidth; }
     public float getCornerRadius() { return cornerRadius; }
@@ -63,7 +83,7 @@ public abstract class Style {
         return borderColor;
     }
 
-    public abstract void drawRect(RenderObject renderObject, float x, float y, float z, float width, float height, float corner, Brush color);
-    public abstract void drawText(RenderObject renderObject, float x, float y, String text, Brush color);
-    public abstract int getWidthText(RenderObject renderObject, String text);
+    public abstract void drawRect(RenderObject renderObject, float x, float y, float z, float width, float height, Brush brush);
+    public abstract void drawWindowRect(RenderObject renderObject, float x, float y, float z, float width, float height, Brush brush);
+
 }

@@ -1,4 +1,4 @@
-package ru.megantcs.enhancer.platform.toolkit.Colors;
+package ru.megantcs.enhancer.platform.toolkit.colors;
 
 import java.awt.*;
 import java.util.Objects;

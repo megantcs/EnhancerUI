@@ -1,4 +1,4 @@
-package ru.megantcs.enhancer.platform.loader.api;
+package ru.megantcs.enhancer.api.lua.reflect;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

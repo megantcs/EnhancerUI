@@ -1,6 +1,9 @@
-package ru.megantcs.hudeditor.utils;
+package ru.megantcs.enhancer.hook.handlers;
 
-import ru.megantcs.enhancer.platform.hook.ScoreboardRenderHook;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.scoreboard.Scoreboard;
+import net.minecraft.scoreboard.ScoreboardObjective;
+import ru.megantcs.enhancer.hook.ScoreboardRenderHook;
 
 public class ScoreboardPosHandler {
     private static float minX = Float.MAX_VALUE;
@@ -13,6 +16,20 @@ public class ScoreboardPosHandler {
     private static float y = 0;
     private static float width = 0;
     private static float height = 0;
+
+    public static boolean isActivity() {
+        MinecraftClient client = MinecraftClient.getInstance();
+
+        if (client.world == null || client.player == null) {
+            return false;
+        }
+
+        Scoreboard scoreboard = client.world.getScoreboard();
+        ScoreboardObjective sidebarObjective = scoreboard.getObjectiveForSlot(1);
+
+        return sidebarObjective != null &&
+                !scoreboard.getAllPlayerScores(sidebarObjective).isEmpty();
+    }
 
     public static void init() {
         ScoreboardRenderHook.RENDER_BACKGROUND.register(params -> {

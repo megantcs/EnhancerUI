@@ -1,4 +1,4 @@
-package ru.megantcs.ImHudEditor.platform.utils;
+package ru.megantcs.enhancer.platform.toolkit;
 
 import net.minecraft.client.MinecraftClient;
 import org.lwjgl.glfw.GLFW;

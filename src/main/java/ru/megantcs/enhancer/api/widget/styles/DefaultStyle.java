@@ -1,12 +1,11 @@
-package ru.megantcs.enhancer.platform.render.engine.widgets;
+package ru.megantcs.enhancer.api.widget.styles;
 
-import ru.megantcs.enhancer.platform.interfaces.Minecraft;
-import ru.megantcs.enhancer.platform.render.engine.math.Vec3d;
-import ru.megantcs.enhancer.platform.render.engine.render.RenderObject;
-import ru.megantcs.enhancer.platform.toolkit.Colors.Brush;
-import ru.megantcs.enhancer.platform.toolkit.utils.Debug;
+import ru.megantcs.enhancer.api.graphics.GraphicsUtils;
+import ru.megantcs.enhancer.impl.core.RenderObject;
+import ru.megantcs.enhancer.platform.toolkit.colors.Brush;
 
 import java.awt.*;
+import java.io.IOException;
 import java.util.Objects;
 
 public class DefaultStyle extends Style
@@ -18,22 +17,23 @@ public class DefaultStyle extends Style
         this.pressedColor = new Brush(new Color(75, 75, 75, 220));
         this.cornerRadius = 4f;
         this.borderWidth = 1.5f;
+        try {
+            this.font = GraphicsUtils.createFontFromResourceTTF(16,"mc");
+        } catch (IOException | FontFormatException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
-    public void drawRect(RenderObject renderObject, float x, float y, float z, float width, float height, float corner, Brush color)
+    public void drawRect(RenderObject renderObject, float x, float y, float z, float width, float height, Brush brush)
     {
-        renderObject.drawRect(new Vec3d(x, y, z), height, width, corner, 1, color);
+        renderObject.drawRect(x, y, z, width, height, cornerRadius, 1, brush);
     }
 
     @Override
-    public void drawText(RenderObject renderObject, float x, float y, String text, Brush color) {
-        Debug.warn("DS", String.join("   ", ""+x, ""+y, text, color.first().toString()));
-        renderObject.drawMCFont(x, y, text, color.first(), false);
-    }
-
-    @Override
-    public int getWidthText(RenderObject renderObject, String text) {
-        return Minecraft.mc.textRenderer.getWidth(text);
+    public void drawWindowRect(RenderObject renderObject, float x, float y, float z, float width, float height, Brush brush) {
+        // shadow
+        renderObject.drawGlow(x, y, z - 1, width, height, cornerRadius, brush);
+        renderObject.drawRect(x, y, z, width, height, cornerRadius, 1, brush);
     }
 }

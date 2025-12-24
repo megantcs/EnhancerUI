@@ -1,31 +1,27 @@
-package ru.megantcs.enhancer.api.lua;
+package ru.megantcs.enhancer.api.lua.chunks;
 
 import org.jetbrains.annotations.NotNull;
+import ru.megantcs.enhancer.api.lua.LuaScriptEngine;
 import ru.megantcs.enhancer.platform.toolkit.Warnings;
-import ru.megantcs.enhancer.platform.toolkit.reflect.Noexcept;
+import ru.megantcs.enhancer.platform.toolkit.api.Noexcept;
 
 import java.io.IOException;
 import java.util.Objects;
 
 public abstract class Chunk
 {
-    @NotNull
-    private String code;
-
-    @NotNull
-    private final String name;
+    @NotNull private String code;
+    @NotNull private final String name;
 
     public Chunk(String code, String name) {
         this.code = Objects.requireNonNull(code);
         this.name = Objects.requireNonNull(name);
-
-        updateValue();
     }
 
     @Noexcept(access = IOException.class)
-    public abstract void updateValue();
+    public abstract Chunk updateValue();
 
-    final boolean executeChunk(LuaEnvironment environment) {
+    public final boolean executeChunk(LuaScriptEngine environment) {
         return environment.loadScript(code, name);
     }
 

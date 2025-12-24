@@ -1,24 +1,35 @@
-package ru.megantcs.enhancer.platform.toolkit.exceptions;
+package ru.megantcs.enhancer.platform.toolkit.exceptions.container.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.megantcs.enhancer.platform.toolkit.reflect.Noexcept;
+import ru.megantcs.enhancer.platform.toolkit.exceptions.container.api.ExceptionItem;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Objects;
 
-public record ExceptionItem(String namespace, Exception exception)
-{
-    private static final Map<String, Logger> INSTANCES = new HashMap<>();
+public class DefaultExceptionItem implements ExceptionItem {
+    private final Logger logger;
 
-    @Noexcept
-    public void printException() {
-        Logger logger;
-        if(!INSTANCES.containsKey(namespace)) {
-            INSTANCES.put(namespace, LoggerFactory.getLogger(namespace));
-        }
-        logger = INSTANCES.get(namespace);
+    private final Throwable exception;
+    private final String namespace;
 
-        logger.error("An exception has occurred", exception);
+    public DefaultExceptionItem(Throwable exception, String namespace) {
+        this.exception = Objects.requireNonNull(exception);
+        this.namespace = Objects.requireNonNull(namespace);
+        this.logger    = LoggerFactory.getLogger(namespace);
+    }
+
+    @Override
+    public String namespace() {
+        return namespace;
+    }
+
+    @Override
+    public Throwable exception() {
+        return exception;
+    }
+
+    @Override
+    public void log() {
+        logger.error("Exception occurred", exception);
     }
 }

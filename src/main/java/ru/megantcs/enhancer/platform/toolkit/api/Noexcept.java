@@ -1,4 +1,4 @@
-package ru.megantcs.enhancer.platform.toolkit.reflect;
+package ru.megantcs.enhancer.platform.toolkit.api;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

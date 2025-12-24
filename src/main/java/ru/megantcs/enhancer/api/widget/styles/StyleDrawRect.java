@@ -1,10 +1,10 @@
-package ru.megantcs.enhancer.platform.render.engine.widgets;
+package ru.megantcs.enhancer.api.widget.styles;
 
-import ru.megantcs.enhancer.platform.render.engine.render.RenderObject;
-import ru.megantcs.enhancer.platform.toolkit.Colors.Brush;
+import ru.megantcs.enhancer.impl.core.RenderObject;
+import ru.megantcs.enhancer.platform.toolkit.colors.Brush;
 
 @FunctionalInterface
 public interface StyleDrawRect
 {
-    void drawRect(RenderObject renderObject, float x, float y, float z, float width, float height, float corner, Brush color);
+    void drawRect(RenderObject renderObject, float x, float y, float z, float width, float height, Brush brush);
 }

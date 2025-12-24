@@ -1,10 +1,11 @@
-package ru.megantcs.autosearchedfarmerholyworld;
+package ru.megantcs.enhancer.platform.toolkit.fabrics;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
+import ru.megantcs.enhancer.platform.toolkit.interfaces.Action;
 
 import static net.fabricmc.fabric.api.client.command.v2.ClientCommandManager.literal;
 

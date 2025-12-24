@@ -1,4 +1,4 @@
-package ru.megantcs.enhancer.platform.toolkit.reflect;
+package ru.megantcs.enhancer.platform.toolkit.api;
 
 public @interface AccessExceptions
 {

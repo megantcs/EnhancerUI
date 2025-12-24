@@ -6,6 +6,12 @@
   "mixins": [
   ],
   "client": [
+    "BossBarHudAccessor",
+    "BossBarHudMixin",
+    "InGameHudMixin",
+    "NativeImageAccessor",
+    "RenderSystemMixin",
+    "WindowMixin"
   ],
   "injectors": {
     "defaultRequire": 1

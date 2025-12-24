@@ -1,6 +1,8 @@
 plugins {
     id 'fabric-loom' version '1.6-SNAPSHOT'
     id 'maven-publish'
+    id "com.github.johnrengelman.shadow" version "7.0.0"
+
 }
 
 version = project.mod_version
@@ -22,6 +24,15 @@ repositories {
     }
 }
 
+configurations {
+    embed {
+        canBeResolved = true
+        canBeConsumed = false
+    }
+    compileClasspath.extendsFrom(embed)
+    runtimeClasspath.extendsFrom(embed)
+}
+
 dependencies {
     // To change the versions see the gradle.properties file
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
@@ -30,6 +41,37 @@ dependencies {
 
     // Fabric API. This is technically optional, but you probably want it anyway.
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    modImplementation "org.ladysnake:satin:${satin_version}"
+    include "org.ladysnake:satin:${satin_version}"
+
+
+    /* ImGui dependencies */
+    implementation "io.github.spair:imgui-java-binding:${project.imguiVersion}"
+    shadow "io.github.spair:imgui-java-binding:${project.imguiVersion}"
+    implementation "io.github.spair:imgui-java-lwjgl3:${project.imguiVersion}"
+    shadow "io.github.spair:imgui-java-lwjgl3:${project.imguiVersion}"
+
+    implementation "io.github.spair:imgui-java-natives-windows:${project.imguiVersion}"
+    shadow "io.github.spair:imgui-java-natives-windows:${project.imguiVersion}"
+    implementation "io.github.spair:imgui-java-natives-linux:${project.imguiVersion}"
+    shadow "io.github.spair:imgui-java-natives-linux:${project.imguiVersion}"
+    implementation "io.github.spair:imgui-java-natives-macos:${project.imguiVersion}"
+    shadow "io.github.spair:imgui-java-natives-macos:${project.imguiVersion}"
+
+    embed fileTree(dir: "lib", include: ['*.jar'])
+}
+
+jar {
+    from("LICENSE") {
+        rename { "${it}_${project.archivesBaseName}"}
+    }
+    from {
+        configurations.embed.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 processResources {
@@ -85,9 +127,6 @@ publishing {
 
     // See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
     repositories {
-        // Add repositories to publish to here.
-        // Notice: This block does NOT have the same function as the block in the top level.
-        // The repositories here will be used for publishing your artifact, not for
-        // retrieving dependencies.
+
     }
 }

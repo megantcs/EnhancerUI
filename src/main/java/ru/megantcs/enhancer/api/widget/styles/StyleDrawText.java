@@ -1,9 +1,9 @@
-package ru.megantcs.enhancer.platform.render.engine.widgets;
+package ru.megantcs.enhancer.api.widget.styles;
 
-import ru.megantcs.enhancer.platform.render.engine.render.RenderObject;
-import ru.megantcs.enhancer.platform.toolkit.Colors.Brush;
+import ru.megantcs.enhancer.impl.core.RenderObject;
+import ru.megantcs.enhancer.platform.toolkit.colors.Brush;
 
 public interface StyleDrawText
 {
-    void drawText(RenderObject renderObject, float x, float y, String text, Brush color);
+    void drawText(RenderObject renderObject, float x, float y, float z, String text, Brush color);
 }

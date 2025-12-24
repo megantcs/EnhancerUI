@@ -1,6 +1,7 @@
 package ru.megantcs.enhancer.api.widget;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.util.math.Vec2f;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.megantcs.enhancer.api.graphics.FontRenderer;
@@ -8,16 +9,17 @@ import ru.megantcs.enhancer.api.graphics.GraphicsMath;
 import ru.megantcs.enhancer.api.widget.styles.DefaultStyle;
 import ru.megantcs.enhancer.api.widget.styles.Style;
 import ru.megantcs.enhancer.impl.core.RenderObject;
+import ru.megantcs.enhancer.impl.core.RenderScreen;
 import ru.megantcs.enhancer.platform.toolkit.colors.Brush;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
+import java.util.*;
 import java.util.List;
 
-public class WidgetCore
+public class Widget
 {
+    protected static final MinecraftClient mc = MinecraftClient.getInstance();
+
     private float width;
     private float height;
     private float x;
@@ -32,8 +34,8 @@ public class WidgetCore
     protected Style style = new DefaultStyle();
 
     protected int zIndex = 0;
-    protected WidgetCore parent = null;
-    protected final List<WidgetCore> children = new ArrayList<>();
+    protected Widget parent = null;
+    protected final List<Widget> children = new ArrayList<>();
 
     protected boolean draggable = false;
     protected boolean resizable = false;
@@ -48,7 +50,7 @@ public class WidgetCore
 
     public Logger logger = LoggerFactory.getLogger(getClass());
 
-    public WidgetCore(float width, float height) {
+    public Widget(float width, float height) {
         this.width = Math.max(minWidth, width);
         this.height = Math.max(minHeight, height);
         this.x = 0;
@@ -89,9 +91,9 @@ public class WidgetCore
     }
 
     protected void renderChildren(RenderObject renderObject, int mouseX, int mouseY, float delta) {
-        children.sort(Comparator.comparingInt(WidgetCore::getZIndex));
+        children.sort(Comparator.comparingInt(Widget::getZIndex));
 
-        for (WidgetCore child : children) {
+        for (Widget child : children) {
             if (child.isVisible()) {
                 child.render(renderObject, mouseX, mouseY, delta);
             }
@@ -106,7 +108,7 @@ public class WidgetCore
     protected void updateHoverState(int mouseX, int mouseY) {
         hovered = isMouseOver(mouseX, mouseY) && enabled && visible;
 
-        for (WidgetCore child : children) child.updateHoverState(mouseX, mouseY);
+        for (Widget child : children) child.updateHoverState(mouseX, mouseY);
     }
 
     public boolean isMouseOver(int mouseX, int mouseY) {
@@ -118,13 +120,12 @@ public class WidgetCore
 
         boolean handled = false;
 
-        List<WidgetCore> sortedChildren = new ArrayList<>(children);
-        sortedChildren.sort(Comparator.comparingInt(WidgetCore::getZIndex).reversed());
+        List<Widget> sortedChildren = new ArrayList<>(children);
+        sortedChildren.sort(Comparator.comparingInt(Widget::getZIndex).reversed());
 
-        for (WidgetCore child : sortedChildren) {
+        for (Widget child : sortedChildren) {
             if (child.mouseClicked(mouseX, mouseY, button)) {
                 handled = true;
-                break;
             }
         }
 
@@ -139,12 +140,6 @@ public class WidgetCore
                     dragging = true;
                     dragOffsetX = (float)(mouseX - getAbsoluteX());
                     dragOffsetY = (float)(mouseY - getAbsoluteY());
-                }
-
-                if (resizable && isMouseOverResizeHandle((int)mouseX, (int)mouseY)) {
-                    resizing = true;
-                    resizeStartX = (float)mouseX;
-                    resizeStartY = (float)mouseY;
                 }
 
                 onMouseClick((int)mouseX, (int)mouseY, button);
@@ -167,7 +162,7 @@ public class WidgetCore
 
         boolean handled = false;
 
-        for (WidgetCore child : children) {
+        for (Widget child : children) {
             if (child.mouseReleased(mouseX, mouseY, button)) {
                 handled = true;
             }
@@ -191,7 +186,7 @@ public class WidgetCore
 
         boolean handled = false;
 
-        for (WidgetCore child : children) {
+        for (Widget child : children) {
             if (child.mouseDragged(mouseX, mouseY, button, deltaX, deltaY)) {
                 handled = true;
             }
@@ -225,17 +220,14 @@ public class WidgetCore
 
         boolean handled = false;
 
-        List<WidgetCore> sortedChildren = new ArrayList<>(children);
-        sortedChildren.sort(Comparator.comparingInt(WidgetCore::getZIndex).reversed());
+        List<Widget> sortedChildren = new ArrayList<>(children);
+        sortedChildren.sort(Comparator.comparingInt(Widget::getZIndex).reversed());
 
-        for (WidgetCore child : sortedChildren) {
-            if (child.mouseScrolled(mouseX, mouseY, amount)) {
-                handled = true;
-                break;
-            }
+        for (Widget child : sortedChildren) {
+            child.mouseScrolled(mouseX, mouseY, amount);
         }
 
-        if (!handled && isMouseOver((int)mouseX, (int)mouseY)) {
+        if (isMouseOver((int)mouseX, (int)mouseY)) {
             onMouseScroll((int)mouseX, (int)mouseY, amount);
             handled = true;
         }
@@ -248,16 +240,12 @@ public class WidgetCore
 
         boolean handled = false;
 
-        for (WidgetCore child : children) {
-            if (child.isFocused() && child.keyPressed(keyCode, scanCode, modifiers)) {
-                handled = true;
-                break;
-            }
+        for (Widget child : children) {
+            child.keyPressed(keyCode, scanCode, modifiers);
         }
 
-        if (!handled && focused) {
+        if (focused) {
             onKeyPress(keyCode, scanCode, modifiers);
-            handled = true;
         }
 
         return handled;
@@ -268,11 +256,8 @@ public class WidgetCore
 
         boolean handled = false;
 
-        for (WidgetCore child : children) {
-            if (child.isFocused() && child.keyReleased(keyCode, scanCode, modifiers)) {
-                handled = true;
-                break;
-            }
+        for (Widget child : children) {
+            child.keyReleased(keyCode, scanCode, modifiers);
         }
 
         if (!handled && focused) {
@@ -288,7 +273,7 @@ public class WidgetCore
 
         boolean handled = false;
 
-        for (WidgetCore child : children) {
+        for (Widget child : children) {
             if (child.isFocused() && child.charTyped(chr, modifiers)) {
                 handled = true;
                 break;
@@ -314,8 +299,8 @@ public class WidgetCore
     protected void onFocusGained() {}
     protected void onFocusLost() {}
 
-    protected void onChildAdded(WidgetCore child) {}
-    protected void onChildRemoved(WidgetCore child) {}
+    protected void onChildAdded(Widget child) {}
+    protected void onChildRemoved(Widget child) {}
 
     private boolean isMouseOverResizeHandle(int mouseX, int mouseY) {
         float absX = getAbsoluteX();
@@ -333,7 +318,7 @@ public class WidgetCore
         this.x += dx;
         this.y += dy;
 
-        for (WidgetCore child : children) {
+        for (Widget child : children) {
             child.move(dx, dy);
         }
     }
@@ -368,7 +353,7 @@ public class WidgetCore
         if (!visible) {
             focused = false;
             pressed = false;
-            for (WidgetCore child : children) {
+            for (Widget child : children) {
                 child.setVisible(false);
             }
         }
@@ -380,7 +365,7 @@ public class WidgetCore
             pressed = false;
             focused = false;
 
-            for (WidgetCore child : children) {
+            for (Widget child : children) {
                 child.setEnabled(false);
             }
         }
@@ -408,7 +393,7 @@ public class WidgetCore
             this.focused = focus;
             if (focus) {
                 onFocusGained();
-                for (WidgetCore child : children) {
+                for (Widget child : children) {
                     child.setFocus(false);
                 }
             } else {
@@ -425,7 +410,7 @@ public class WidgetCore
         return style;
     }
 
-    public WidgetCore setCornerRadius(float radius) {
+    public Widget setCornerRadius(float radius) {
         style.setCornerRadius(radius);
         return this;
     }
@@ -465,7 +450,7 @@ public class WidgetCore
     public void setZIndex(int zIndex) { this.zIndex = zIndex; }
     public int getZIndex() { return zIndex; }
 
-    public void setParent(WidgetCore parent) {
+    public void setParent(Widget parent) {
         if (this.parent != null) {
             this.parent.removeChild(this);
         }
@@ -474,7 +459,7 @@ public class WidgetCore
             parent.addChild(this);
         }
     }
-    public WidgetCore getParent() { return parent; }
+    public Widget getParent() { return parent; }
 
     public float getAbsoluteX() {
         if (parent != null) return parent.getAbsoluteX() + x;
@@ -523,7 +508,7 @@ public class WidgetCore
         });
     }
 
-    public boolean addChild(WidgetCore child) {
+    public boolean addChild(Widget child) {
         if (child == this || children.contains(child)) {
             return false;
         }
@@ -534,7 +519,7 @@ public class WidgetCore
         return true;
     }
 
-    public boolean removeChild(WidgetCore child) {
+    public boolean removeChild(Widget child) {
         if (children.remove(child)) {
             child.parent = null;
             onChildRemoved(child);
@@ -544,16 +529,16 @@ public class WidgetCore
     }
 
     public void clearChildren() {
-        for (WidgetCore child : new ArrayList<>(children)) {
+        for (Widget child : new ArrayList<>(children)) {
             removeChild(child);
         }
     }
 
-    public List<WidgetCore> getChildren() {
+    public List<Widget> getChildren() {
         return Collections.unmodifiableList(children);
     }
 
-    public WidgetCore getChild(int index) {
+    public Widget getChild(int index) {
         return children.get(index);
     }
 
@@ -561,11 +546,11 @@ public class WidgetCore
         return style.getGridColor();
     }
 
-    public WidgetCore getChildAt(float x, float y) {
-        List<WidgetCore> sortedChildren = new ArrayList<>(children);
-        sortedChildren.sort(Comparator.comparingInt(WidgetCore::getZIndex).reversed());
+    public Widget getChildAt(float x, float y) {
+        List<Widget> sortedChildren = new ArrayList<>(children);
+        sortedChildren.sort(Comparator.comparingInt(Widget::getZIndex).reversed());
 
-        for (WidgetCore child : sortedChildren) {
+        for (Widget child : sortedChildren) {
             if (child.isVisible() && child.containsPoint(x, y)) {
                 return child;
             }
@@ -574,19 +559,19 @@ public class WidgetCore
     }
 
     public void setChildrenZIndex(int zIndex) {
-        for (WidgetCore child : children) {
+        for (Widget child : children) {
             child.setZIndex(zIndex);
         }
     }
 
     public void setChildrenVisible(boolean visible) {
-        for (WidgetCore child : children) {
+        for (Widget child : children) {
             child.setVisible(visible);
         }
     }
 
     public void setChildrenEnabled(boolean enabled) {
-        for (WidgetCore child : children) {
+        for (Widget child : children) {
             child.setEnabled(enabled);
         }
     }
@@ -601,5 +586,85 @@ public class WidgetCore
 
     public void drawWindowRect(RenderObject renderObject, float x, float y, float z, float width, float height, Brush brush)  {
         style.drawWindowRect(renderObject, x, y, z, width, height, brush);
+    }
+
+    protected float getWidthText(String text) {
+        return getFont().getWidth(text);
+    }
+
+    protected float getHeightText(String text) {
+        return getFont().getHeight(text);
+    }
+    protected void setScreen(RenderScreen renderScreen) {
+        execute(()->MinecraftClient.getInstance().setScreen(renderScreen));
+    }
+    protected void drawText(RenderObject renderObject, float x, float y, float z, String text, Brush color) {
+        Objects.requireNonNull(renderObject);
+        Objects.requireNonNull(text);
+        Objects.requireNonNull(color);
+        getFont().drawString(renderObject.matrixStack, text, x, y, z, color.first().getRGB());
+    }
+
+    protected Vec2f calcCenterText(String text) {
+        var textWidth = getWidthText(text);
+        float textX = getX() + (getWidth() - textWidth) / 2;
+        float textY = getY() + (getHeight() - getFont().getHeightLine()) / 2 + 3;
+
+        return new Vec2f(textX, textY);
+    }
+
+    protected int getWindowWidth() {
+        return MinecraftClient.getInstance().getWindow().getWidth();
+    }
+
+    protected int getWindowHeight() {
+        return MinecraftClient.getInstance().getWindow().getHeight();
+    }
+
+    protected int getWindowCenterX() {
+        return getWindowWidth() / 2;
+    }
+
+    protected int getWindowCenterY() {
+        return getWindowHeight() / 2;
+    }
+
+    protected float getWindowCenterXF() {
+        return getWindowWidth() / 2.0f;
+    }
+
+    protected float getWindowCenterYF() {
+        return getWindowHeight() / 2.0f;
+    }
+
+    public void setHorizontalAlignment(HorizontalAlignment horizontalAlignment)
+    {
+        switch (horizontalAlignment)
+        {
+            case LEFT -> {
+                setPosition(0, getY());
+            }
+            case CENTER -> {
+                setPosition((getWindowWidth() - width) / 2.0f, getY());
+            }
+            case RIGHT -> {
+                setPosition(getWindowWidth() - width, getY());
+            }
+        }
+    }
+
+    public void setVerticalAlignment(VerticalAlignment verticalAlignment)
+    {
+        switch (verticalAlignment) {
+            case TOP -> {
+                setPosition(getX(), 0);
+            }
+            case BOTTOM -> {
+                setPosition(getX(), getWindowHeight() - height);
+            }
+            case CENTER -> {
+                setPosition(getX(), (getWindowHeight() - height) / 2.0f);
+            }
+        }
     }
 }

@@ -1,4 +1,7 @@
 package ru.megantcs.enhancer.platform.toolkit.interfaces;
 
-public interface Action {
+@FunctionalInterface
+public interface Action<T>
+{
+    void invoke(T args);
 }

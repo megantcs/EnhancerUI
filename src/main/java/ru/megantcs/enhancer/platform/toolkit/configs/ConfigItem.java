@@ -1,4 +1,4 @@
-package ru.megantcs.Core.Platform;
+package ru.megantcs.enhancer.platform.toolkit.configs;
 
 public interface ConfigItem
 {

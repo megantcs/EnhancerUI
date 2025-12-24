@@ -12,7 +12,7 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 
-public class ComboBox extends Widget
+public class Dropdown extends Widget
 {
     final Set<String> options;
     final String title;
@@ -24,7 +24,7 @@ public class ComboBox extends Widget
 
     public ActionEvent<String> OnSelectedItem = EventFactory.makeActionEvent();
 
-    public ComboBox(String title, Set<String> options) {
+    public Dropdown(String title, Set<String> options) {
         super(1, 15);
         Objects.requireNonNull(title);
         Objects.requireNonNull(options);
@@ -47,7 +47,7 @@ public class ComboBox extends Widget
         setSize(getWidthForOptions(title, options) + 40, 15);
     }
 
-    public ComboBox(String title, String... options) {
+    public Dropdown(String title, String... options) {
         this(title, new HashSet<>(List.of(options)));
     }
 
@@ -281,7 +281,7 @@ public class ComboBox extends Widget
         return result;
     }
 
-    public ComboBox setItemHeight(float height) {
+    public Dropdown setItemHeight(float height) {
         this.itemHeight = Math.max(20, height);
         return this;
     }

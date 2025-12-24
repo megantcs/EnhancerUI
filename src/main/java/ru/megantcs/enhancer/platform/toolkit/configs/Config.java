@@ -1,4 +1,4 @@
-package ru.megantcs.Core.Platform;
+package ru.megantcs.enhancer.platform.toolkit.configs;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -17,12 +17,13 @@ import java.util.List;
 
 public class Config
 {
-    public static Config INSTANCE = new Config();
+    public static Config INSTANCE = new Config("platform");
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
-    private String folder = MinecraftClient.getInstance().runDirectory + "\\config\\megantcs";
+    private String folder = MinecraftClient.getInstance().runDirectory + "\\config\\";
 
-    public Config() {
+    public Config(String targetFolder) {
+        folder += targetFolder;
         File configDir = new File(folder);
         if (!configDir.exists()) {
             configDir.mkdirs();
@@ -38,9 +39,7 @@ public class Config
 
             Files.writeString(path, json);
 
-            System.out.println("Saved array to: " + fullPath + " (" + items.size() + " items)");
         } catch (IOException e) {
-            System.err.println("Failed to save array: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -86,7 +85,6 @@ public class Config
 
             List<T> items = new ArrayList<>();
 
-            // Читаем существующие элементы
             if (Files.exists(path)) {
                 String existingJson = Files.readString(path);
                 JsonArray jsonArray = gson.fromJson(existingJson, JsonArray.class);
@@ -99,16 +97,11 @@ public class Config
                 }
             }
 
-            // Добавляем новый
             items.add(item);
 
-            // Сохраняем
             String json = gson.toJson(items);
             Files.writeString(path, json);
-
-            System.out.println("Appended item to " + fullPath + ", total: " + items.size());
         } catch (Exception e) {
-            System.err.println("Failed to append: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -120,12 +113,9 @@ public class Config
             Path path = Paths.get(fullPath);
 
             String json = item.serialize();
-
             Files.writeString(path, json);
 
-            System.out.println("Config saved to: " + fullPath);
         } catch (IOException e) {
-            System.err.println("Failed to save config: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -139,14 +129,12 @@ public class Config
             if (Files.exists(path)) {
                 String json = Files.readString(path);
                 item.deserialize(json);
-                System.out.println("Config loaded from: " + fullPath);
             } else {
                 saveToFile(item, fileName);
                 String json = Files.readString(path);
                 item.deserialize(json);
             }
         } catch (IOException e) {
-            System.err.println("Failed to load config: " + e.getMessage());
             e.printStackTrace();
         }
     }

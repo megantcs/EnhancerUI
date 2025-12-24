@@ -1,78 +1,64 @@
-package ru.megantcs.enhancer.platform.toolkit.exceptions;
+package ru.megantcs.enhancer.platform.toolkit.exceptions.container.impl;
 
-import ru.megantcs.enhancer.platform.toolkit.reflect.Noexcept;
+import com.sun.jna.platform.win32.WinUser;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import ru.megantcs.enhancer.platform.toolkit.exceptions.container.api.ExceptionContainer;
+import ru.megantcs.enhancer.platform.toolkit.exceptions.container.api.ExceptionItem;
 
-import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
-public class ExceptionContainer
+public class DefaultExceptionContainer implements ExceptionContainer
 {
     private final List<ExceptionItem> items;
 
-    public ExceptionContainer() {
-        items = new CopyOnWriteArrayList<>();
-    }
-
-    public boolean add(String namespace, Exception exception)
-    {
-        Objects.requireNonNull(namespace);
-        Objects.requireNonNull(exception);
-
-        return items.add(new ExceptionItem(namespace, exception));
-    }
-
-    @Noexcept
-    public Optional<ExceptionItem> last() {
-        if(items.isEmpty()) {
-            return Optional.empty();
-        }
-
-        var item = items.get(0);
-        if(item == null) return Optional.empty();
-
-        return Optional.of(item);
-    }
-
-    public void printAll() {
-        items.forEach(ExceptionItem::printException);
-    }
-
-    public void printLast() {
-        if(items.isEmpty()) return;
-
-        items.get(items.size() - 1).printException();
-    }
-
-    public boolean add(Class<?> clazz, Exception exception) {
-        Objects.requireNonNull(clazz);
-        Objects.requireNonNull(exception);
-
-        return items.add(new ExceptionItem(clazz.getName(), exception));
-    }
-
-    public Set<ExceptionItem> get(String namespace) {
-        var list = new HashSet<ExceptionItem>();
-        for (ExceptionItem item : items) {
-            if(Objects.equals(item.namespace(), namespace)) {
-                list.add(item);
-            }
-        }
-
-        return list;
-    }
-
-    public Set<Exception> getExceptions() {
-        var exceptions = new HashSet<Exception>();
-        for (ExceptionItem item : items) {
-            exceptions.add(item.exception());
-        }
-        return exceptions;
+    protected DefaultExceptionContainer(List<ExceptionItem> listType) {
+        this.items = Objects.requireNonNull(listType);
     }
 
     @Override
-    public String toString() {
-        return "ExceptionContainer{" +
-                "items=" + items +
-                '}';
+    public boolean add(@NotNull String namespace, @NotNull Throwable exception) {
+        Objects.requireNonNull(namespace);
+        Objects.requireNonNull(exception);
+
+        return items.add(ExceptionItem.of(namespace, exception));
+    }
+
+    @Override
+    public @Nullable ExceptionItem last() {
+        if(items.isEmpty()) return null;
+        return items.get(items.size() - 1);
+    }
+
+    @Override
+    public @NotNull List<ExceptionItem> getByNamespace(String namespace) {
+        var list = new ArrayList<ExceptionItem>();
+        for (ExceptionItem item : items) {
+            if(item.namespace().equals(namespace)) list.add(item);
+        }
+        return list;
+    }
+
+    @Override
+    public @NotNull List<ExceptionItem> getAll() {
+        return Collections.unmodifiableList(items);
+    }
+
+    @Override
+    public void logLast() {
+        var last = last();
+        if(last != null) last.log();
+    }
+
+    @Override
+    public void logAll() {
+        items.forEach(ExceptionItem::log);
+    }
+
+    public static DefaultExceptionContainer of(List<ExceptionItem> listType) {
+        return new DefaultExceptionContainer(listType);
     }
 }

@@ -1,19 +1,24 @@
 package ru.megantcs.enhancer.platform.toolkit.events.impl;
 
 import ru.megantcs.enhancer.platform.toolkit.events.api.Event;
-import ru.megantcs.enhancer.platform.toolkit.events.api.LambdaEvent;
-import ru.megantcs.enhancer.platform.toolkit.events.api.SupportedEvent;
 
 import java.util.List;
 import java.util.Objects;
 
 public class RunnableEvent
-        extends Event<Runnable> implements SupportedEvent<Runnable>
+        extends Event<Runnable>
 {
     private final List<RunnableEventData> subscribes;
 
     public RunnableEvent(List<RunnableEventData> listType) {
         subscribes = listType;
+        this.invoker = this::emit;
+    }
+
+    public void emit() {
+        subscribes.forEach((e)->{
+            e.subscribe().run();
+        });
     }
 
     @Override
@@ -25,7 +30,6 @@ public class RunnableEvent
         return true;
     }
 
-    @Override
     public boolean contains(String name) {
         Objects.requireNonNull(name, "name cannot be null");
 
@@ -48,13 +52,17 @@ public class RunnableEvent
     }
 
     @Override
+    public boolean unregister(Runnable runnable) {
+        return subscribes.removeIf(e -> e.subscribe.equals(runnable));
+    }
+
+    @Override
     public boolean unregister(String name) {
         Objects.requireNonNull(name, "name cannot be null");
 
         return subscribes.removeIf((e)-> Objects.equals(e.name, name));
     }
 
-    @Override
     public boolean contains(Runnable runnable) {
         Objects.requireNonNull(runnable, "runnable cannot be null");
 

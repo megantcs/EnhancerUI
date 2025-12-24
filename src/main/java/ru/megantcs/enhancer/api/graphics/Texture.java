@@ -1,4 +1,4 @@
-package ru.megantcs.enhancer.platform.render.api.Font;
+package ru.megantcs.enhancer.api.graphics;
 
 import net.minecraft.util.Identifier;
 

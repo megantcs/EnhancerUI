@@ -8,3 +8,4 @@ build/
 .gradletasknamecache
 run
 .task
+src/main/java/ru/megantcs/HudEditor

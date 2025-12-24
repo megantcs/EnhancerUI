@@ -10,12 +10,12 @@ import ru.megantcs.enhancer.platform.toolkit.exceptions.container.api.ExceptionC
 
 import java.util.Objects;
 
-public class LuaSandbox
+public class LuaScriptEngine
 {
     final ExceptionContainer exceptionContainer;
     private Globals globals;
 
-    public LuaSandbox(ExceptionContainer exceptionContainer) {
+    public LuaScriptEngine(ExceptionContainer exceptionContainer) {
         this.exceptionContainer = Objects.requireNonNull(exceptionContainer);
         reloadEnvironment();
     }
@@ -43,7 +43,7 @@ public class LuaSandbox
 
             return true;
         } catch (Exception e) {
-            exceptionContainer.add(LuaSandbox.class, e);
+            exceptionContainer.add(LuaScriptEngine.class, e);
         }
         return false;
     }

@@ -1,4 +1,8 @@
 package ru.megantcs.enhancer.api.widget;
 
-public class HorizontalAlignment {
+public enum HorizontalAlignment {
+    LEFT,
+    CENTER,
+    RIGHT,
+    STRETCH,
 }
