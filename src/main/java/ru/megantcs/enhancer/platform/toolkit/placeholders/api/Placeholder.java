@@ -1,4 +1,4 @@
-package ru.megantcs.enhancer.platform.toolkit.Placeholders;
+package ru.megantcs.enhancer.platform.toolkit.placeholders;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -58,17 +58,23 @@ public interface Placeholder
     }
 
     @AccessExceptions(access = NullPointerException.class)
+    default void addAll(@NotNull MapBuilder<String, String> data) {
+        Objects.requireNonNull(data);
+        addAll(data.get());
+    }
+
+    @AccessExceptions(access = NullPointerException.class)
     @Nullable String getVariable(@NotNull String key);
 
     @Noexcept
     @NotNull Map<String, String> getVariables();
 
-    class SimplePlaceholder implements Placeholder
+    class BasePlaceholder implements Placeholder
     {
         private final Map<String, String> data = new HashMap<>();
         private final ParseTokens tokens;
 
-        public SimplePlaceholder(String first, String second) {
+        public BasePlaceholder(String first, String second) {
             Objects.requireNonNull(first, second);
             tokens = new ParseTokens(first, second);
         }
