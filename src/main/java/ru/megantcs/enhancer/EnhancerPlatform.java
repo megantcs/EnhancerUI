@@ -6,10 +6,10 @@ import ru.megantcs.enhancer.api.lua.LuaSandBox;
 import ru.megantcs.enhancer.api.lua.wrappers.*;
 import ru.megantcs.enhancer.impl.core.LuaWrappers.RenderObjectSingleton;
 import ru.megantcs.enhancer.impl.core.LuaWrappers.RenderObjectWrapper;
+import ru.megantcs.enhancer.platform.toolkit.configs.ConfigOLD;
 import ru.megantcs.enhancer.platform.toolkit.placeholders.api.Placeholder;
 import ru.megantcs.enhancer.platform.toolkit.placeholders.api.PlaceholderFactory;
 import ru.megantcs.enhancer.platform.toolkit.api.API;
-import ru.megantcs.enhancer.platform.toolkit.configs.Config;
 import ru.megantcs.enhancer.platform.toolkit.events.eventbus.EventBusRegister;
 import ru.megantcs.enhancer.platform.toolkit.exceptions.container.api.ExceptionFactory;
 
@@ -45,13 +45,13 @@ public class EnhancerPlatform
     }
 
     @API(status = API.Status.MAINTAINED)
-    public static @NotNull Config createConfig(String modName) {
-        return new Config(Objects.requireNonNull(modName));
+    public static @NotNull ConfigOLD createConfig(String modName) {
+        return new ConfigOLD(Objects.requireNonNull(modName));
     }
 
     @API(status = API.Status.MAINTAINED)
-    public static @NotNull Config platformConfig() {
-        return Config.INSTANCE;
+    public static @NotNull ConfigOLD platformConfig() {
+        return ConfigOLD.INSTANCE;
     }
 
     @API(status = API.Status.MAINTAINED)

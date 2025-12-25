@@ -4,49 +4,64 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.reflect.TypeToken;
-import net.minecraft.client.MinecraftClient;
+import org.jetbrains.annotations.Nullable;
+import ru.megantcs.enhancer.platform.toolkit.api.API;
+import ru.megantcs.enhancer.platform.toolkit.exceptions.container.api.ExceptionContainer;
 
-import java.io.*;
-import java.lang.reflect.Type;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
-public class Config
+@API(status = API.Status.MAINTAINED)
+public interface Config
 {
-    public static Config INSTANCE = new Config("platform");
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    @Nullable <T extends ConfigItem> List<T> loadArrayFromFile(Class<T> itemClass,
+                                                               ExceptionContainer exceptionContainer) throws IOException;
 
-    private String folder = MinecraftClient.getInstance().runDirectory + "\\config\\";
+    <T extends ConfigItem> void saveArrayToFile(List<T> items) throws IOException;
 
-    public Config(String targetFolder) {
-        folder += targetFolder;
-        File configDir = new File(folder);
-        if (!configDir.exists()) {
-            configDir.mkdirs();
+    <T extends ConfigItem> void appendToFile(T item,
+                                             Class<T> itemClass) throws IOException;
+
+    void saveToFile(ConfigItem item) throws IOException;
+    void loadFromFile(ConfigItem item) throws IOException;
+
+    boolean deleteFile();
+    boolean fileExists();
+
+    class BaseConfigImpl implements Config
+    {
+        private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+
+        private final String fileName;
+        private final String directory;
+
+        public BaseConfigImpl(String fileName, String directory) {
+            Objects.requireNonNull(fileName);
+            Objects.requireNonNull(directory);
+
+            this.fileName = fileName;
+            this.directory = directory;
         }
-    }
 
-    public <T extends ConfigItem> void saveArrayToFile(List<T> items, String fileName) {
-        try {
-            String fullPath = folder + "\\" + fileName + ".json";
+
+        @Override
+        public <T extends ConfigItem> void saveArrayToFile(List<T> items) throws IOException {
+            String fullPath = directory + "\\" + fileName;
             Path path = Paths.get(fullPath);
-
             String json = gson.toJson(items);
 
             Files.writeString(path, json);
-
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-    }
 
-    public <T extends ConfigItem> List<T> loadArrayFromFile(String fileName, Class<T> itemClass) {
-        try {
-            String fullPath = folder + "\\" + fileName + ".json";
+        @Override
+        public @Nullable <T extends ConfigItem> List<T> loadArrayFromFile(Class<T> itemClass, ExceptionContainer exceptionContainer) throws IOException {
+            String fullPath = directory + "\\" + fileName;
             Path path = Paths.get(fullPath);
 
             if (Files.exists(path)) {
@@ -65,22 +80,20 @@ public class Config
 
                             result.add(item);
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            exceptionContainer.add(Config.BaseConfigImpl.class, e);
                         }
                     }
                 }
 
                 return result;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return new ArrayList<>();
-    }
 
-    public <T extends ConfigItem> void appendToFile(T item, String fileName, Class<T> itemClass) {
-        try {
-            String fullPath = folder + "\\" + fileName + ".json";
+            return null;
+        }
+
+        @Override
+        public <T extends ConfigItem> void appendToFile(T item, Class<T> itemClass) throws IOException {
+            String fullPath = directory + "\\" + fileName;
             Path path = Paths.get(fullPath);
 
             List<T> items = new ArrayList<>();
@@ -101,64 +114,44 @@ public class Config
 
             String json = gson.toJson(items);
             Files.writeString(path, json);
-        } catch (Exception e) {
-            e.printStackTrace();
         }
-    }
 
-    public void saveToFile(ConfigItem item, String fileName)
-    {
-        try {
-            String fullPath = folder + "\\" + fileName + ".json";
+        @Override
+        public void saveToFile(ConfigItem item) throws IOException {
+            String fullPath = directory + "\\" + fileName;
             Path path = Paths.get(fullPath);
 
             String json = item.serialize();
             Files.writeString(path, json);
-
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-    }
 
-    public void loadFromFile(ConfigItem item, String fileName)
-    {
-        try {
-            String fullPath = folder + "\\" + fileName + ".json";
+        @Override
+        public void loadFromFile(ConfigItem item) throws IOException {
+            String fullPath = directory + "\\" + fileName;
             Path path = Paths.get(fullPath);
 
             if (Files.exists(path)) {
                 String json = Files.readString(path);
                 item.deserialize(json);
             } else {
-                saveToFile(item, fileName);
+                saveToFile(item);
                 String json = Files.readString(path);
                 item.deserialize(json);
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
-    }
 
-    public boolean deleteFile(String fileName) {
-        String fullPath = folder + "\\" + fileName + ".json";
-        File file = new File(fullPath);
-        return file.delete();
-    }
+        @Override
+        public boolean deleteFile() {
+            String fullPath = directory + "\\" + fileName;
+            File file = new File(fullPath);
 
-    public boolean fileExists(String fileName) {
-        String fullPath = folder + "\\" + fileName + ".json";
-        return new File(fullPath).exists();
-    }
+            return file.delete();
+        }
 
-    public String getFolderPath() {
-        return folder;
-    }
-
-    public void setFolder(String newFolder) {
-        this.folder = newFolder;
-        File configDir = new File(folder);
-        if (!configDir.exists()) {
-            configDir.mkdirs();
+        @Override
+        public boolean fileExists() {
+            String fullPath = directory + "\\" + fileName;
+            return new File(fullPath).exists();
         }
     }
 }

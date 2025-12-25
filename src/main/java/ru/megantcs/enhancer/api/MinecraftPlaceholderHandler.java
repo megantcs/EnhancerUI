@@ -26,6 +26,7 @@ public class MinecraftPlaceholderHandler implements EventHandler
     {
         if( minecraftClient.player != null) {
             placeholder.addVariableOrNull("display_name", minecraftClient.player.getDisplayName().getString(), "(null)");
+            placeholder.addVariableOrNull("name", minecraftClient.player.getName().getString(), "(null)");
             placeholder.addVariableOrNull("health",  String.format("%.1f", minecraftClient.player.getHealth()), "0.0");
             placeholder.addVariable("x", String.format("%.1f", minecraftClient.player.getX()));
             placeholder.addVariable("y", String.format("%.1f", minecraftClient.player.getY()));

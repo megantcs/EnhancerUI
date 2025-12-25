@@ -1,6 +1,5 @@
 package ru.megantcs.enhancer.platform.toolkit.exceptions.container.impl;
 
-import com.sun.jna.platform.win32.WinUser;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ru.megantcs.enhancer.platform.toolkit.exceptions.container.api.ExceptionContainer;
@@ -35,6 +34,8 @@ public class DefaultExceptionContainer implements ExceptionContainer
 
     @Override
     public @NotNull List<ExceptionItem> getByNamespace(String namespace) {
+        Objects.requireNonNull(namespace);
+
         var list = new ArrayList<ExceptionItem>();
         for (ExceptionItem item : items) {
             if(item.namespace().equals(namespace)) list.add(item);
@@ -56,6 +57,17 @@ public class DefaultExceptionContainer implements ExceptionContainer
     @Override
     public void logAll() {
         items.forEach(ExceptionItem::log);
+    }
+
+    @Override
+    public boolean hasException(@NotNull String namespace) {
+        Objects.requireNonNull(namespace);
+        for (ExceptionItem item : items) {
+            if(Objects.equals(item.namespace(), namespace)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static DefaultExceptionContainer of(List<ExceptionItem> listType) {
