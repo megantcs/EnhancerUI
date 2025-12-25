@@ -40,30 +40,26 @@ public interface Config
 
         private final String fileName;
         private final String directory;
+        private final Path path;
 
-        public BaseConfigImpl(String fileName, String directory) {
+        protected BaseConfigImpl(String fileName, String directory) {
             Objects.requireNonNull(fileName);
             Objects.requireNonNull(directory);
 
             this.fileName = fileName;
             this.directory = directory;
+            this.path = Paths.get(directory, fileName);
         }
 
 
         @Override
         public <T extends ConfigItem> void saveArrayToFile(List<T> items) throws IOException {
-            String fullPath = directory + "\\" + fileName;
-            Path path = Paths.get(fullPath);
             String json = gson.toJson(items);
-
             Files.writeString(path, json);
         }
 
         @Override
         public @Nullable <T extends ConfigItem> List<T> loadArrayFromFile(Class<T> itemClass, ExceptionContainer exceptionContainer) throws IOException {
-            String fullPath = directory + "\\" + fileName;
-            Path path = Paths.get(fullPath);
-
             if (Files.exists(path)) {
                 String json = Files.readString(path);
                 List<T> result = new ArrayList<>();
@@ -93,9 +89,6 @@ public interface Config
 
         @Override
         public <T extends ConfigItem> void appendToFile(T item, Class<T> itemClass) throws IOException {
-            String fullPath = directory + "\\" + fileName;
-            Path path = Paths.get(fullPath);
-
             List<T> items = new ArrayList<>();
 
             if (Files.exists(path)) {
@@ -118,18 +111,12 @@ public interface Config
 
         @Override
         public void saveToFile(ConfigItem item) throws IOException {
-            String fullPath = directory + "\\" + fileName;
-            Path path = Paths.get(fullPath);
-
             String json = item.serialize();
             Files.writeString(path, json);
         }
 
         @Override
         public void loadFromFile(ConfigItem item) throws IOException {
-            String fullPath = directory + "\\" + fileName;
-            Path path = Paths.get(fullPath);
-
             if (Files.exists(path)) {
                 String json = Files.readString(path);
                 item.deserialize(json);
@@ -142,10 +129,7 @@ public interface Config
 
         @Override
         public boolean deleteFile() {
-            String fullPath = directory + "\\" + fileName;
-            File file = new File(fullPath);
-
-            return file.delete();
+            return path.toFile().delete();
         }
 
         @Override

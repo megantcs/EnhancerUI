@@ -1,6 +1,6 @@
 package ru.megantcs.enhancer.platform.toolkit.configs;
 
-public interface ConfigItem
+public interface SerializeConfig
 {
     String serialize();
     void deserialize(String json);
