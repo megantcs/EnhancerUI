@@ -1,20 +1,22 @@
-package ru.megantcs.ImHudEditor.platform.utils.interfaces;
+package ru.megantcs.enhancer.platform.toolkit.events;
 
-import ru.megantcs.ImHudEditor.api.Events.api.Event;
-import ru.megantcs.ImHudEditor.api.Events.impl.EventFactory;
+import org.jetbrains.annotations.Nullable;
+import ru.megantcs.enhancer.platform.toolkit.events.api.Event;
+import ru.megantcs.enhancer.platform.toolkit.events.impl.ActionEvent;
+import ru.megantcs.enhancer.platform.toolkit.interfaces.Action;
 
 import java.util.Objects;
 
 public class EventChangedField<FieldType>
 {
-    FieldType data;
+    private FieldType data;
 
     public EventChangedField() {
         data = null;
     }
 
-    public EventChangedField(FieldType base) {
-        data = Objects.requireNonNull(base);
+    public EventChangedField(@Nullable FieldType base) {
+        data = base;
     }
 
     public FieldType getValue() {
@@ -23,8 +25,8 @@ public class EventChangedField<FieldType>
 
     public void setValue(FieldType value) {
         data = value;
-        ChangedValue.emit(value);
+        ChangedValue.invoker().invoke(value);
     }
 
-    public Event<FieldType> ChangedValue = EventFactory.create();
+    public Event<Action<FieldType>> ChangedValue = EventFactory.makeActionEvent();
 }

@@ -25,7 +25,7 @@ public class LuaMixinHub
 
     public void addModule(LuaMixinModule module) {
         Objects.requireNonNull(module, "module cannot be null");
-        module.init(luaSandBox.sandBox());
+        module.init(luaSandBox.scriptEngine());
         module.onChunkUpdate();
 
         mixinModuleList.add(module);
@@ -37,7 +37,7 @@ public class LuaMixinHub
 
     public void initAll() {
         for (LuaMixinModule luaMixinModule : mixinModuleList) {
-            luaMixinModule.init(luaSandBox.sandBox());
+            luaMixinModule.init(luaSandBox.scriptEngine());
         }
     }
 

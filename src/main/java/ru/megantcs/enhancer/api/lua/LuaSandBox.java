@@ -12,7 +12,6 @@ import ru.megantcs.enhancer.api.lua.reflect.LuaTableCreator;
 import ru.megantcs.enhancer.platform.toolkit.Warnings;
 import ru.megantcs.enhancer.platform.toolkit.events.EventFactory;
 import ru.megantcs.enhancer.platform.toolkit.events.impl.RunnableEvent;
-import ru.megantcs.enhancer.platform.toolkit.exceptions.container.api.ExceptionFactory;
 import ru.megantcs.enhancer.platform.toolkit.exceptions.container.api.ExceptionContainer;
 
 import java.io.IOException;
@@ -212,7 +211,7 @@ public class LuaSandBox
         return namespace + "@" + start;
     }
 
-    public LuaScriptEngine sandBox() {
+    public LuaScriptEngine scriptEngine() {
         return environment;
     }
 
