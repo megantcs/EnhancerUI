@@ -76,5 +76,5 @@ public class RunnableEvent
         return "runnable#event@" + obj.hashCode();
     }
 
-    public static record RunnableEventData(String name, Runnable subscribe) {}
+    record RunnableEventData(String name, Runnable subscribe) {}
 }

@@ -1,7 +1,6 @@
 package ru.megantcs.enhancer.platform.toolkit.colors;
 
 import java.awt.*;
-import java.util.Objects;
 
 public class ColorConvertor
 {
@@ -38,26 +37,34 @@ public class ColorConvertor
         return color;
     }
 
+    public static Color stringToColor(String text) {
+        String lowerHex = text.toLowerCase().trim();
+        return switch (lowerHex) {
+            case "white" -> Color.WHITE;
+            case "red" -> Color.RED;
+            case "green" -> Color.GREEN;
+            case "blue" -> Color.BLUE;
+            case "black" -> Color.BLACK;
+            case "yellow" -> Color.YELLOW;
+            case "cyan" -> Color.CYAN;
+            case "magenta" -> Color.MAGENTA;
+            case "gray" -> Color.GRAY;
+            case "lightgray" -> Color.LIGHT_GRAY;
+            case "darkgray" -> Color.DARK_GRAY;
+            case "pink" -> Color.PINK;
+            case "orange" -> Color.gray;
+            default -> null;
+        };
+    }
+
     public static Color hexToColor(String hex) {
         if (hex == null) {
             return Color.BLACK;
         }
 
-        String lowerHex = hex.toLowerCase().trim();
-        switch (lowerHex) {
-            case "white": return Color.WHITE;
-            case "red": return Color.RED;
-            case "green": return Color.GREEN;
-            case "blue": return Color.BLUE;
-            case "black": return Color.BLACK;
-            case "yellow": return Color.YELLOW;
-            case "cyan": return Color.CYAN;
-            case "magenta": return Color.MAGENTA;
-            case "gray": return Color.GRAY;
-            case "lightgray": return Color.LIGHT_GRAY;
-            case "darkgray": return Color.DARK_GRAY;
-            case "pink": return Color.PINK;
-            case "orange": return Color.ORANGE;
+       var stringToColor = stringToColor(hex);
+        if(stringToColor != null) {
+            return stringToColor;
         }
 
         String cleanHex = hex.startsWith("#") ? hex.substring(1) : hex;
@@ -80,68 +87,69 @@ public class ColorConvertor
                             (rgb >> 8) & 0xFF,
                             rgb & 0xFF
                     );
+
                 case 4:
-                    cleanHex = "" +
-                            cleanHex.charAt(0) + cleanHex.charAt(0) +
-                            cleanHex.charAt(1) + cleanHex.charAt(1) +
-                            cleanHex.charAt(2) + cleanHex.charAt(2) +
-                            cleanHex.charAt(3) + cleanHex.charAt(3);
+                    char r = cleanHex.charAt(0);
+                    char g = cleanHex.charAt(1);
+                    char b = cleanHex.charAt(2);
+                    char a = cleanHex.charAt(3);
+                    cleanHex = "" + r + r + g + g + b + b + a + a;
                 case 8:
                     long rgba = Long.parseLong(cleanHex, 16);
-                    return new Color(
-                            (int) ((rgba >> 16) & 0xFF),
-                            (int) ((rgba >> 8) & 0xFF),
-                            (int) (rgba & 0xFF),
-                            (int) ((rgba >> 24) & 0xFF)
-                    );
+                    int red = (int) ((rgba >> 16) & 0xFF);
+                    int green = (int) ((rgba >> 8) & 0xFF);
+                    int blue = (int) (rgba & 0xFF);
+                    int alpha = (int) ((rgba >> 24) & 0xFF);
+                    return new Color(red, green, blue, alpha);
+
                 case 7:
                     if (cleanHex.matches("[0-9a-fA-F]{7}")) {
-                        cleanHex = cleanHex + "F";
-                        long rgba7 = Long.parseLong(cleanHex, 16);
+                        String rgbPart = cleanHex.substring(0, 6);
+                        int fallbackRgb = Integer.parseInt(rgbPart, 16);
                         return new Color(
-                                (int) ((rgba7 >> 16) & 0xFF),
-                                (int) ((rgba7 >> 8) & 0xFF),
-                                (int) (rgba7 & 0xFF),
-                                (int) ((rgba7 >> 24) & 0xFF)
+                                (fallbackRgb >> 16) & 0xFF,
+                                (fallbackRgb >> 8) & 0xFF,
+                                fallbackRgb & 0xFF
                         );
                     }
                     break;
+
                 case 9:
                     if (cleanHex.startsWith("f") || cleanHex.startsWith("F")) {
-                        String shortened = cleanHex.substring(1);
-                        long argb = Long.parseLong(shortened, 16);
-                        return new Color(
-                                (int) ((argb >> 16) & 0xFF),
-                                (int) ((argb >> 8) & 0xFF),
-                                (int) (argb & 0xFF),
-                                (int) ((argb >> 24) & 0xFF)
-                        );
+                        String argbHex = cleanHex.substring(1); // убираем 'F'
+                        long argb = Long.parseLong(argbHex, 16);
+                        int alphaArg = (int) ((argb >> 24) & 0xFF);
+                        int redArg = (int) ((argb >> 16) & 0xFF);
+                        int greenArg = (int) ((argb >> 8) & 0xFF);
+                        int blueArg = (int) (argb & 0xFF);
+                        return new Color(redArg, greenArg, blueArg, alphaArg);
                     }
                     break;
+
                 case 12:
                     int r12 = Integer.parseInt(cleanHex.substring(0, 3), 16);
                     int g12 = Integer.parseInt(cleanHex.substring(3, 6), 16);
                     int b12 = Integer.parseInt(cleanHex.substring(6, 9), 16);
                     int a12 = Integer.parseInt(cleanHex.substring(9, 12), 16);
-
                     return new Color(
                             r12 * 255 / 4095,
                             g12 * 255 / 4095,
                             b12 * 255 / 4095,
                             a12 * 255 / 4095
                     );
+
                 case 16:
                     long r16 = Long.parseLong(cleanHex.substring(0, 4), 16);
                     long g16 = Long.parseLong(cleanHex.substring(4, 8), 16);
                     long b16 = Long.parseLong(cleanHex.substring(8, 12), 16);
                     long a16 = Long.parseLong(cleanHex.substring(12, 16), 16);
-
                     return new Color(
                             (int) (r16 * 255 / 65535),
                             (int) (g16 * 255 / 65535),
                             (int) (b16 * 255 / 65535),
                             (int) (a16 * 255 / 65535)
                     );
+
                 default:
                     if (cleanHex.length() >= 6) {
                         String rgbHex = cleanHex.substring(0, 6);

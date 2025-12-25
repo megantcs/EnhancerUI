@@ -1,10 +1,8 @@
-package ru.megantcs.enhancer.platform.toolkit.placeholders;
+package ru.megantcs.enhancer.platform.toolkit.placeholders.api;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import ru.megantcs.enhancer.platform.toolkit.api.Noexcept;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 

@@ -10,8 +10,8 @@ import java.util.Set;
 
 public class BackendArrayEvent<Invoker> extends Event<Invoker>
 {
-    private Func<Invoker[], Invoker> invokerHandler;
-    private Set<Invoker> subscribes;
+    private final Func<Invoker[], Invoker> invokerHandler;
+    private final Set<Invoker> subscribes;
 
     final Class<Invoker> type;
 

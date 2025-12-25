@@ -11,11 +11,17 @@ import ru.megantcs.enhancer.platform.toolkit.Warnings;
  */
 public abstract class Event<Invoker>
 {
-    protected static final Logger LOGGER = LoggerFactory.getLogger(Event.class);
+    protected final Logger LOGGER;
 
     protected volatile Invoker invoker;
 
-    public final Invoker invoker() { return invoker; }
+    protected Event() {
+        LOGGER = LoggerFactory.getLogger(getClass());
+    }
+
+    public final Invoker invoker() {
+        return invoker;
+    }
 
     public abstract boolean register(Invoker invoker);
     public abstract boolean register(String name, Invoker invoker);

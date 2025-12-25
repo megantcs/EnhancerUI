@@ -63,5 +63,5 @@ public class ActionEvent<T> extends Event<Action<T>>
         return subscribes.removeIf((e)-> Objects.equals(e.name, name));
     }
 
-    public static record ActionEventData<T>(String name, Action<T> sub) {}
+    private record ActionEventData<T>(String name, Action<T> sub) {}
 }

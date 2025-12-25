@@ -3,10 +3,11 @@ package ru.megantcs.enhancer;
 import org.jetbrains.annotations.NotNull;
 import ru.megantcs.enhancer.api.MinecraftPlaceholderHandler;
 import ru.megantcs.enhancer.api.lua.LuaSandBox;
+import ru.megantcs.enhancer.api.lua.wrappers.*;
 import ru.megantcs.enhancer.impl.core.LuaWrappers.RenderObjectSingleton;
 import ru.megantcs.enhancer.impl.core.LuaWrappers.RenderObjectWrapper;
-import ru.megantcs.enhancer.platform.toolkit.Placeholders.Placeholder;
-import ru.megantcs.enhancer.platform.toolkit.Placeholders.PlaceholderFactory;
+import ru.megantcs.enhancer.platform.toolkit.placeholders.api.Placeholder;
+import ru.megantcs.enhancer.platform.toolkit.placeholders.api.PlaceholderFactory;
 import ru.megantcs.enhancer.platform.toolkit.api.API;
 import ru.megantcs.enhancer.platform.toolkit.configs.Config;
 import ru.megantcs.enhancer.platform.toolkit.events.eventbus.EventBusRegister;
@@ -24,6 +25,12 @@ public class EnhancerPlatform
     public static @NotNull LuaSandBox supportEnhancer() {
         LuaSandBox sandBox = empty();
         try {
+            sandBox.loadClass(ReflectionWrapper.class);
+            sandBox.loadClass(FieldWrapper.class);
+            sandBox.loadClass(MethodWrapper.class);
+            sandBox.loadClass(Class.class);
+            sandBox.loadClass(ConstructorWrapper.class);
+            sandBox.loadClass(DebugWrapper.class);
             sandBox.loadClass(RenderObjectSingleton.class);
             sandBox.loadClass(RenderObjectWrapper.class);
         } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {

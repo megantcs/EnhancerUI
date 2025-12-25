@@ -7,8 +7,10 @@ import ru.megantcs.enhancer.platform.toolkit.events.impl.FuncEvent;
 import ru.megantcs.enhancer.platform.toolkit.events.impl.RunnableEvent;
 import ru.megantcs.enhancer.platform.toolkit.interfaces.Func;
 
+import javax.swing.text.html.Option;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class EventFactory
@@ -17,16 +19,13 @@ public class EventFactory
         return new BackendArrayEvent<>(type, invoker);
     }
 
-    public static  RunnableEvent makeRunnableEvent(List<RunnableEvent.RunnableEventData> listType) {
-        return new RunnableEvent(listType);
-    }
 
-    public static  RunnableEvent makeRunnableEvent() {
+    public static RunnableEvent makeRunnableEvent() {
         return new RunnableEvent(new ArrayList<>());
     }
 
     public static  RunnableEvent makeRunnableEventSync() {
-        return makeRunnableEvent(new CopyOnWriteArrayList<>());
+        return new RunnableEvent(new CopyOnWriteArrayList<>());
     }
 
     public static  RunnableEvent makeRunnableEventArray() {

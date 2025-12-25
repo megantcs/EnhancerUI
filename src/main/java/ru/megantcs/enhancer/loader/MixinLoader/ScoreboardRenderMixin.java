@@ -19,9 +19,9 @@ public class ScoreboardRenderMixin extends LuaMixinModule
 
     @Override
     public void init(LuaScriptEngine sandbox) {
-        ScoreboardRenderHook.RENDER_BACKGROUND.register(this::scoreboard$background, "scoreboard$background");
-        ScoreboardRenderHook.RENDER_HEADER.register(this::scoreboard$header, "scoreboard$header");
-        ScoreboardRenderHook.RENDER_SEPARATOR.register(this::scoreboard$separator, "scoreboard$separator");
+        ScoreboardRenderHook.RENDER_BACKGROUND.register( "scoreboard$background", this::scoreboard$background);
+        ScoreboardRenderHook.RENDER_HEADER.register("scoreboard$header", this::scoreboard$header);
+        ScoreboardRenderHook.RENDER_SEPARATOR.register("scoreboard$separator", this::scoreboard$separator);
 
         this.sandbox = sandbox;
     }

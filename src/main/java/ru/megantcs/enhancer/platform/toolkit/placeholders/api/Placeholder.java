@@ -1,4 +1,4 @@
-package ru.megantcs.enhancer.platform.toolkit.placeholders;
+package ru.megantcs.enhancer.platform.toolkit.placeholders.api;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

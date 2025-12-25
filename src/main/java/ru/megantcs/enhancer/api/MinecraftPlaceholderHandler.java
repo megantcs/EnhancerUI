@@ -2,7 +2,7 @@ package ru.megantcs.enhancer.api;
 
 import net.minecraft.client.MinecraftClient;
 
-import ru.megantcs.enhancer.platform.toolkit.Placeholders.Placeholder;
+import ru.megantcs.enhancer.platform.toolkit.placeholders.api.Placeholder;
 import ru.megantcs.enhancer.platform.toolkit.events.eventbus.EventBusRegister;
 import ru.megantcs.enhancer.platform.toolkit.events.eventbus.EventHandler;
 

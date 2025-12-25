@@ -8,7 +8,8 @@ import ru.megantcs.enhancer.platform.toolkit.interfaces.Func;
 import java.util.List;
 import java.util.Objects;
 
-public class FuncEvent<ArgumentType, ReturnType> extends Event<Func<ArgumentType, ReturnType>>
+public class FuncEvent<ArgumentType, ReturnType>
+        extends Event<Func<ArgumentType, ReturnType>>
 {
     private final List<FuncEventData<ArgumentType, ReturnType>> subscribes;
     private final ReturnType defaultValue;
@@ -20,6 +21,7 @@ public class FuncEvent<ArgumentType, ReturnType> extends Event<Func<ArgumentType
         this.invoker = this::emit;
     }
 
+    @Override
     public boolean register(@NotNull Func<ArgumentType, ReturnType> event) {
         subscribes.add(new FuncEventData<>(Objects.requireNonNull(event, "event cannot be null"), "func#event@" + event.hashCode()));
         return true;
@@ -53,16 +55,13 @@ public class FuncEvent<ArgumentType, ReturnType> extends Event<Func<ArgumentType
         return false;
     }
 
-    public boolean register(@NotNull Func<ArgumentType, ReturnType> event,
-                         @NotNull String name) {
-        return subscribes.add(new FuncEventData<>(event, name));
-    }
-
+    @Override
     public boolean unregister(@NotNull Func<ArgumentType, ReturnType> event) {
         Objects.requireNonNull(event, "event cannot be null");
         return subscribes.removeIf((data)-> data.subscribe == event);
     }
 
+    @Override
     public boolean unregister(String name)
     {
         Objects.requireNonNull(name, "name cannot be null");
@@ -80,7 +79,7 @@ public class FuncEvent<ArgumentType, ReturnType> extends Event<Func<ArgumentType
         return result;
     }
 
-    public static record FuncEventData<ArgumentType, ReturnType>(Func<ArgumentType, ReturnType> subscribe, String name)
+    record FuncEventData<ArgumentType, ReturnType>(Func<ArgumentType, ReturnType> subscribe, String name)
     {
         @Override
         public boolean equals(Object obj) {

@@ -20,8 +20,8 @@ public class HotbarRenderMixin extends LuaMixinModule
     {
         this.sandbox = sandbox;
 
-        HotBarRenderHook.RENDER_BACKGROUND.register(this::mixin$hotbar$background, "mixin$hotbar$background");
-        HotBarRenderHook.RENDER_SELECT_SLOT.register(this::mixin$hotbar$select, "mixin$hotbar$select");
+        HotBarRenderHook.RENDER_BACKGROUND.register("mixin$hotbar$background", this::mixin$hotbar$background);
+        HotBarRenderHook.RENDER_SELECT_SLOT.register("mixin$hotbar$select", this::mixin$hotbar$select);
     }
 
     private boolean mixin$hotbar$select(PosObject posObject)

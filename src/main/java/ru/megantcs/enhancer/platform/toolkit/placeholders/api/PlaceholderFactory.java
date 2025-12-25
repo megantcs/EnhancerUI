@@ -1,4 +1,4 @@
-package ru.megantcs.enhancer.platform.toolkit.placeholders;
+package ru.megantcs.enhancer.platform.toolkit.placeholders.api;
 
 public interface PlaceholderFactory
 {
@@ -9,7 +9,6 @@ public interface PlaceholderFactory
     Placeholder createPlaceholder(String first, String second);
 
     class BasePlaceholderFactory implements PlaceholderFactory {
-
         @Override
         public Placeholder createPlaceholder(String first, String second) {
             return new Placeholder.BasePlaceholder(first, second);
