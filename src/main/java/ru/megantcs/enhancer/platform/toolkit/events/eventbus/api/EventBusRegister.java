@@ -1,0 +1,14 @@
+package ru.megantcs.enhancer.platform.toolkit.events.eventbus.api;
+
+import ru.megantcs.enhancer.platform.toolkit.api.API;
+import ru.megantcs.enhancer.platform.toolkit.api.AccessExceptions;
+
+@API(status = API.Status.MAINTAINED)
+public interface EventBusRegister
+{
+    @AccessExceptions(access = NullPointerException.class)
+    void register(EventHandler eventHandler);
+
+    @AccessExceptions(access = NullPointerException.class)
+    boolean unregister(EventHandler eventHandler);
+}

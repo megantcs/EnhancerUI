@@ -56,6 +56,7 @@ public class HotbarRenderMixin extends LuaMixinModule
     {
         this.background = null;
         this.render = null;
+        this.select = null;
         HotBarRenderHook.RENDER_BACKGROUND.unregister("mixin$hotbar$background");
         HotBarRenderHook.RENDER_SELECT_SLOT.unregister("mixin$hotbar$select");
     }

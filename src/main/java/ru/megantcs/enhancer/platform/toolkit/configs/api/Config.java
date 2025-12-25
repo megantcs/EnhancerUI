@@ -1,4 +1,4 @@
-package ru.megantcs.enhancer.platform.toolkit.configs;
+package ru.megantcs.enhancer.platform.toolkit.configs.api;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -20,19 +20,19 @@ import java.util.Objects;
 @API(status = API.Status.MAINTAINED)
 public interface Config
 {
-    @Nullable <T extends ConfigItem> List<T> loadArrayFromFile(Class<T> itemClass,
-                                                               ExceptionContainer exceptionContainer) throws IOException;
+    @Nullable <T extends SerializeConfig> List<T> loadArray(Class<T> itemClass,
+                                                            ExceptionContainer exceptionContainer) throws IOException;
 
-    <T extends ConfigItem> void saveArrayToFile(List<T> items) throws IOException;
+    <T extends SerializeConfig> void saveArray(List<T> items) throws IOException;
 
-    <T extends ConfigItem> void appendToFile(T item,
-                                             Class<T> itemClass) throws IOException;
+    <T extends SerializeConfig> void append(T item,
+                                            Class<T> itemClass) throws IOException;
 
-    void saveToFile(ConfigItem item) throws IOException;
-    void loadFromFile(ConfigItem item) throws IOException;
+    void save(SerializeConfig item) throws IOException;
+    void load(SerializeConfig item) throws IOException;
 
-    boolean deleteFile();
-    boolean fileExists();
+    boolean delete();
+    boolean exists();
 
     class BaseConfigImpl implements Config
     {
@@ -49,17 +49,32 @@ public interface Config
             this.fileName = fileName;
             this.directory = directory;
             this.path = Paths.get(directory, fileName);
+            try {
+                ensureDirectoryExists();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
 
+        private void ensureDirectoryExists() throws IOException {
+            Path dirPath = Paths.get(directory);
+            if (!Files.exists(dirPath)) {
+                Files.createDirectories(dirPath);
+            }
+        }
+
         @Override
-        public <T extends ConfigItem> void saveArrayToFile(List<T> items) throws IOException {
+        public <T extends SerializeConfig> void saveArray(List<T> items) throws IOException {
+            ensureDirectoryExists();
             String json = gson.toJson(items);
             Files.writeString(path, json);
         }
 
         @Override
-        public @Nullable <T extends ConfigItem> List<T> loadArrayFromFile(Class<T> itemClass, ExceptionContainer exceptionContainer) throws IOException {
+        public @Nullable <T extends SerializeConfig> List<T> loadArray(Class<T> itemClass, ExceptionContainer exceptionContainer) throws IOException {
+            ensureDirectoryExists();
+
             if (Files.exists(path)) {
                 String json = Files.readString(path);
                 List<T> result = new ArrayList<>();
@@ -88,7 +103,7 @@ public interface Config
         }
 
         @Override
-        public <T extends ConfigItem> void appendToFile(T item, Class<T> itemClass) throws IOException {
+        public <T extends SerializeConfig> void append(T item, Class<T> itemClass) throws IOException {
             List<T> items = new ArrayList<>();
 
             if (Files.exists(path)) {
@@ -110,32 +125,43 @@ public interface Config
         }
 
         @Override
-        public void saveToFile(ConfigItem item) throws IOException {
+        public void save(SerializeConfig item) throws IOException {
             String json = item.serialize();
             Files.writeString(path, json);
         }
 
         @Override
-        public void loadFromFile(ConfigItem item) throws IOException {
+        public void load(SerializeConfig item) throws IOException {
             if (Files.exists(path)) {
                 String json = Files.readString(path);
                 item.deserialize(json);
             } else {
-                saveToFile(item);
+                save(item);
                 String json = Files.readString(path);
                 item.deserialize(json);
             }
         }
 
         @Override
-        public boolean deleteFile() {
+        public boolean delete() {
             return path.toFile().delete();
         }
 
         @Override
-        public boolean fileExists() {
-            String fullPath = directory + "\\" + fileName;
-            return new File(fullPath).exists();
+        public boolean exists() {
+            return path.toFile().exists();
+        }
+
+        protected Path getPath() {
+            return path;
+        }
+
+        protected String getDirectory() {
+            return directory;
+        }
+
+        protected String getFileName() {
+            return fileName;
         }
     }
 }

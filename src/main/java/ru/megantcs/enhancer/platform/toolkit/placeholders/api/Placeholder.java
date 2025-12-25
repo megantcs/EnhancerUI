@@ -2,6 +2,7 @@ package ru.megantcs.enhancer.platform.toolkit.placeholders.api;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import ru.megantcs.enhancer.api.core.PartPipeline;
 import ru.megantcs.enhancer.platform.toolkit.api.API;
 import ru.megantcs.enhancer.platform.toolkit.api.AccessExceptions;
 import ru.megantcs.enhancer.platform.toolkit.api.Noexcept;
@@ -26,7 +27,7 @@ import java.util.Objects;
  * @since [1.0]
  */
 @API(status = API.Status.MAINTAINED, since = "1.0")
-public interface Placeholder
+public interface Placeholder extends PartPipeline.PartPipelineSupported<Placeholder>
 {
     @AccessExceptions(access = NullPointerException.class)
     void addVariable(@NotNull String name, @NotNull String value);
@@ -133,6 +134,12 @@ public interface Placeholder
         @Override
         public @NotNull Map<String, String> getVariables() {
             return Map.copyOf(data);
+        }
+
+        @Override
+        public Placeholder paste(@NotNull Placeholder item) {
+            addAll(item.getVariables());
+            return this;
         }
 
         private record ParseTokens(String first, String second) {}

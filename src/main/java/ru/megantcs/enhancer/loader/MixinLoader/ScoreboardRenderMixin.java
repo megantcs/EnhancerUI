@@ -35,6 +35,7 @@ public class ScoreboardRenderMixin extends LuaMixinModule
         background = null;
         header = null;
         separator = null;
+        render = null;
     }
 
     private boolean scoreboard$background(ScoreboardRenderHook.RenderInfo renderInfo) {

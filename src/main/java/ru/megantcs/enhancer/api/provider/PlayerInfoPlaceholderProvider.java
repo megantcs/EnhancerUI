@@ -1,18 +1,19 @@
-package ru.megantcs.enhancer.api;
+package ru.megantcs.enhancer.api.provider;
 
 import net.minecraft.client.MinecraftClient;
 
+import ru.megantcs.enhancer.platform.toolkit.events.eventbus.api.EventBusRegister;
+import ru.megantcs.enhancer.platform.toolkit.interfaces.Returnable;
 import ru.megantcs.enhancer.platform.toolkit.placeholders.api.Placeholder;
-import ru.megantcs.enhancer.platform.toolkit.events.eventbus.EventBusRegister;
-import ru.megantcs.enhancer.platform.toolkit.events.eventbus.EventHandler;
+import ru.megantcs.enhancer.platform.toolkit.events.eventbus.api.EventHandler;
 
 import java.util.Objects;
 
-public class MinecraftPlaceholderHandler implements EventHandler
+public class PlayerInfoPlaceholderProvider implements EventHandler, Returnable<Placeholder>
 {
     private final Placeholder placeholder;
 
-    private MinecraftPlaceholderHandler(EventBusRegister busRegister, Placeholder placeholder)
+    public PlayerInfoPlaceholderProvider(EventBusRegister busRegister, Placeholder placeholder)
     {
         Objects.requireNonNull(busRegister);
         Objects.requireNonNull(placeholder);
@@ -24,7 +25,7 @@ public class MinecraftPlaceholderHandler implements EventHandler
     @Override
     public void onGameTick(MinecraftClient minecraftClient)
     {
-        if( minecraftClient.player != null) {
+        if(minecraftClient.player != null) {
             placeholder.addVariableOrNull("display_name", minecraftClient.player.getDisplayName().getString(), "(null)");
             placeholder.addVariableOrNull("name", minecraftClient.player.getName().getString(), "(null)");
             placeholder.addVariableOrNull("health",  String.format("%.1f", minecraftClient.player.getHealth()), "0.0");
@@ -36,12 +37,8 @@ public class MinecraftPlaceholderHandler implements EventHandler
         }
     }
 
-    public Placeholder getPlaceholder() {
+    @Override
+    public Placeholder get() {
         return placeholder;
     }
-
-    public static MinecraftPlaceholderHandler create(EventBusRegister busRegister, Placeholder placeholder) {
-        return new MinecraftPlaceholderHandler(busRegister, placeholder);
-    }
-
 }

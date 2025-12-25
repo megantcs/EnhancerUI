@@ -1,35 +1,32 @@
 package ru.megantcs.enhancer;
 
 import org.jetbrains.annotations.NotNull;
-import ru.megantcs.enhancer.api.MinecraftPlaceholderHandler;
+import ru.megantcs.enhancer.api.core.PartPipeline;
+import ru.megantcs.enhancer.api.provider.PlayerInfoPlaceholderProvider;
 import ru.megantcs.enhancer.api.lua.LuaSandBox;
 import ru.megantcs.enhancer.api.lua.wrappers.*;
+import ru.megantcs.enhancer.api.provider.SystemPlaceholderProvider;
 import ru.megantcs.enhancer.impl.core.LuaWrappers.RenderObjectSingleton;
 import ru.megantcs.enhancer.impl.core.LuaWrappers.RenderObjectWrapper;
-import ru.megantcs.enhancer.platform.toolkit.configs.ConfigOLD;
+import ru.megantcs.enhancer.platform.toolkit.events.eventbus.EventBusFactory;
+import ru.megantcs.enhancer.platform.toolkit.events.eventbus.api.EventBusRegister;
 import ru.megantcs.enhancer.platform.toolkit.placeholders.api.Placeholder;
 import ru.megantcs.enhancer.platform.toolkit.placeholders.api.PlaceholderFactory;
 import ru.megantcs.enhancer.platform.toolkit.api.API;
-import ru.megantcs.enhancer.platform.toolkit.events.eventbus.EventBusRegister;
 import ru.megantcs.enhancer.platform.toolkit.exceptions.container.api.ExceptionFactory;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Objects;
 
 public class EnhancerPlatform
 {
     private static final EventBusRegister PLATFORM_BUS_REGISTER;
-    private static final MinecraftPlaceholderHandler PLATFORM_PLACEHOLDER;
+    private static final Placeholder BASE_PLACEHOLDER;
+    private static final Placeholder PLATFORM_PLACEHOLDER;
 
     @API(status = API.Status.MAINTAINED)
-    public static @NotNull LuaSandBox supportEnhancer() {
-        LuaSandBox sandBox = empty();
+    public static @NotNull LuaSandBox supportEnhancerSandbox() {
+        LuaSandBox sandBox = emptySandBox();
         try {
-            sandBox.loadClass(ReflectionWrapper.class);
-            sandBox.loadClass(FieldWrapper.class);
-            sandBox.loadClass(MethodWrapper.class);
-            sandBox.loadClass(ClassWrapper.class);
-            sandBox.loadClass(ConstructorWrapper.class);
             sandBox.loadClass(DebugWrapper.class);
             sandBox.loadClass(RenderObjectSingleton.class);
             sandBox.loadClass(RenderObjectWrapper.class);
@@ -40,18 +37,8 @@ public class EnhancerPlatform
     }
 
     @API(status = API.Status.MAINTAINED)
-    public static @NotNull LuaSandBox empty() {
+    public static @NotNull LuaSandBox emptySandBox() {
         return new LuaSandBox(ExceptionFactory.createConcurrentContainer());
-    }
-
-    @API(status = API.Status.MAINTAINED)
-    public static @NotNull ConfigOLD createConfig(String modName) {
-        return new ConfigOLD(Objects.requireNonNull(modName));
-    }
-
-    @API(status = API.Status.MAINTAINED)
-    public static @NotNull ConfigOLD platformConfig() {
-        return ConfigOLD.INSTANCE;
     }
 
     @API(status = API.Status.MAINTAINED)
@@ -61,11 +48,21 @@ public class EnhancerPlatform
 
     @API(status = API.Status.MAINTAINED)
     public static Placeholder platformPlaceholder() {
-        return PLATFORM_PLACEHOLDER.getPlaceholder();
+        return PLATFORM_PLACEHOLDER;
+    }
+
+    @API(status = API.Status.MAINTAINED)
+    public static Placeholder basePlaceholder() {
+        return BASE_PLACEHOLDER;
     }
 
     static {
-        PLATFORM_BUS_REGISTER = EventBusRegister.getInstance();
-        PLATFORM_PLACEHOLDER = MinecraftPlaceholderHandler.create(platformEventBus(), PlaceholderFactory.create("{", "}"));
+        PLATFORM_BUS_REGISTER = EventBusFactory.getInstance();
+        BASE_PLACEHOLDER = PlaceholderFactory.create("{", "}");
+        PLATFORM_PLACEHOLDER = new PartPipeline<Placeholder>(BASE_PLACEHOLDER)
+                .part(new SystemPlaceholderProvider(BASE_PLACEHOLDER))
+                .part(new PlayerInfoPlaceholderProvider(PLATFORM_BUS_REGISTER, BASE_PLACEHOLDER)).get();
     }
 }
+
+

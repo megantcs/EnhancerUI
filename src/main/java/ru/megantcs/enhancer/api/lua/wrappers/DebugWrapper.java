@@ -12,21 +12,21 @@ public class DebugWrapper
     private static final Logger logger = LoggerFactory.getLogger("Debug");
 
     @LuaExportMethod @Noexcept
-    public static void log(Object message)
+    public static void log(String message)
     {
         if(message == null) return;
         logger.info("~ {}",message);
     }
 
     @LuaExportMethod @Noexcept
-    public static void err(Object message)
+    public static void err(String message)
     {
         if(message == null) return;
         logger.error("~ {}",message);
     }
 
     @LuaExportMethod @Noexcept
-    public static void warn(Object message)
+    public static void warn(String message)
     {
         if(message == null) return;
         logger.warn("~ {}",message);
