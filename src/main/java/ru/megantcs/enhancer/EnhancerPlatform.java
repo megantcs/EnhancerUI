@@ -28,7 +28,7 @@ public class EnhancerPlatform
             sandBox.loadClass(ReflectionWrapper.class);
             sandBox.loadClass(FieldWrapper.class);
             sandBox.loadClass(MethodWrapper.class);
-            sandBox.loadClass(Class.class);
+            sandBox.loadClass(ClassWrapper.class);
             sandBox.loadClass(ConstructorWrapper.class);
             sandBox.loadClass(DebugWrapper.class);
             sandBox.loadClass(RenderObjectSingleton.class);
