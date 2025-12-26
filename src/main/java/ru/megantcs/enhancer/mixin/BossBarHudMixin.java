@@ -15,6 +15,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import ru.megantcs.enhancer.hook.BossBarRenderHook;
+import ru.megantcs.enhancer.hook.data.BossBarRenderData;
 
 import java.util.Map;
 import java.util.Objects;
@@ -71,14 +72,14 @@ public abstract class BossBarHudMixin
         if (height == 0) {
             // ФОН
             var cancel = BossBarRenderHook.RENDER_BACKGROUND.emit(
-                    new BossBarRenderHook.BossBarRenderData(context, x, y, width, 5)
+                    new BossBarRenderData(context, x, y, width, 5)
             );
             if(!cancel) {
                 context.drawTexture(BARS_TEXTURE, x, y, 0, bossBar.getColor().ordinal() * 5 * 2 + height, width, 5);
             }
         } else if (height == 5) {
             var cancel = BossBarRenderHook.RENDER_PROGRESS.emit(
-                    new BossBarRenderHook.BossBarRenderData(context, x, y, width, 5)
+                    new BossBarRenderData(context, x, y, width, 5)
             );
             if(!cancel) {
                 context.drawTexture(BARS_TEXTURE, x, y, 0, bossBar.getColor().ordinal() * 5 * 2 + height, width, 5);

@@ -39,7 +39,7 @@ public class RenderObject
 
     public void drawBlur(float x, float y, float z, float width, float height, float radius, float alpha, float blur, Brush brush) {
         Objects.requireNonNull(brush);
-        GraphicsUtils.renderBlur(matrixStack, x, y, z, width, height, radius, brush.first(), alpha, blur);
+        GraphicsUtils.renderBlur(matrixStack, x, y, z, width, height, radius, brush.first(), blur, alpha);
     }
 
     public void drawLine(Vec3d start, Vec3d end, float widthLine, Brush brush) {

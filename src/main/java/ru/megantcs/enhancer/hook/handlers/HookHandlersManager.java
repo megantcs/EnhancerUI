@@ -6,5 +6,6 @@ public class HookHandlersManager
         ScoreboardPosHandler.init();
         HotBarPosHandler.init();
         BossBarPosHandler.init();
+        ScreenHookHandler.init();
     }
 }

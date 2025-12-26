@@ -10,7 +10,9 @@
     "BossBarHudMixin",
     "InGameHudMixin",
     "NativeImageAccessor",
+    "ParentElementMixin",
     "RenderSystemMixin",
+    "ScreenMixin",
     "WindowMixin"
   ],
   "injectors": {

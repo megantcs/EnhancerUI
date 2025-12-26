@@ -47,10 +47,41 @@ public class Dropdown extends Widget
         setSize(getWidthForOptions(title, options) + 40, 15);
     }
 
+    public void setOptions(Set<String> options) {
+        Objects.requireNonNull(options);
+
+        this.options.clear();
+        this.options.addAll(options);
+
+        this.items.clear();
+        for (String option : options) {
+            items.add(new ComboBoxItem(option));
+        }
+
+        boolean hasPreviousSelection = false;
+        for (ComboBoxItem item : items) {
+            if (item.getTitle().equals(selected)) {
+                item.setSelected(true);
+                hasPreviousSelection = true;
+                break;
+            }
+        }
+
+        if (!hasPreviousSelection && !items.isEmpty()) {
+            this.selected = items.get(0).getTitle();
+            items.get(0).setSelected(true);
+        }
+
+        setSize(getWidthForOptions(title, options) + 40, getHeight());
+
+        if (dropdown) {
+            updateItemsPositions();
+        }
+    }
+
     public Dropdown(String title, String... options) {
         this(title, new HashSet<>(List.of(options)));
     }
-
 
     private int getWidthForOptions(String title, Set<String> options) {
         var maxWidth = getWidthText(title);
@@ -90,7 +121,7 @@ public class Dropdown extends Widget
     protected void renderBackground(RenderObject renderObject)
     {
         drawRect(renderObject, getX(), getY(), getZIndex() - 1, getWidth(),
-                 getHeight(), getCurrentBackgroundColor());
+                 getHeight(), getBackgroundColor());
     }
 
     @Override
@@ -377,12 +408,7 @@ public class Dropdown extends Widget
                         parentColor.getAlpha()
                 );
             } else if (selected) {
-                itemBgColor = new Color(
-                        Math.min(255, parentColor.getRed() + 20),
-                        Math.min(255, parentColor.getGreen() + 20),
-                        Math.min(255, parentColor.getBlue() + 50),
-                        parentColor.getAlpha()
-                );
+                itemBgColor = parentColor;
             } else {
                 itemBgColor = parentColor;
             }

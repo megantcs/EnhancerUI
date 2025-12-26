@@ -1,4 +1,7 @@
 package ru.megantcs.enhancer.hook.data;
 
-public class ScreenRenderHookKeyReleased {
-}
+import net.minecraft.client.gui.ParentElement;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+public record ScreenRenderHookKeyReleased(ParentElement parentElement, int keyCode, int scanCode, int modifiers, CallbackInfoReturnable<Boolean> cir) {}
+

@@ -28,6 +28,7 @@ public class DefaultStyle extends Style
     public void drawRect(RenderObject renderObject, float x, float y, float z, float width, float height, Brush brush)
     {
         renderObject.drawRect(x, y, z, width, height, cornerRadius, 1, brush);
+        renderObject.drawGlow(x, y, z - 1, width, height, cornerRadius, brush);
     }
 
     @Override

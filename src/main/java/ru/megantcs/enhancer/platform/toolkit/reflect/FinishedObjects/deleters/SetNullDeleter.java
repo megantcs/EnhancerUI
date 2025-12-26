@@ -4,6 +4,7 @@ import ru.megantcs.enhancer.platform.toolkit.reflect.FinishedObjects.Deleter;
 
 import java.lang.reflect.Field;
 
+@Deprecated
 public class SetNullDeleter implements Deleter
 {
 

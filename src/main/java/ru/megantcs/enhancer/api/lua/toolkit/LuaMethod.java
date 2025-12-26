@@ -8,6 +8,7 @@ import ru.megantcs.enhancer.api.lua.reflect.wrappers.FieldWrapper;
 import ru.megantcs.enhancer.platform.toolkit.reflect.AnnotationSearcher;
 
 import java.lang.reflect.Field;
+import java.util.List;
 import java.util.Objects;
 
 public class LuaMethod
@@ -26,22 +27,34 @@ public class LuaMethod
         }
     }
 
+    public void callArg(Object arg, String name) {
+        LuaTable table = new LuaTable();
+        table.set(name, LuaConvertor.toLua(arg));
+
+        try {
+            value.call(table);
+        }
+        catch (RuntimeException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void call(Object... arg)
     {
         LuaTable table = new LuaTable();
         for (Object o : arg) {
-            var fields = AnnotationSearcher.getFields(o.getClass(), LuaExportField.class);
-            for (Field field : fields)
-            {
-                if (!field.isAccessible()) {
-                    field.setAccessible(true);
+                var fields = AnnotationSearcher.getFields(o.getClass(), LuaExportField.class);
+                for (Field field : fields) {
+                    if (!field.isAccessible()) {
+                        field.setAccessible(true);
+                    }
+                    try {
+                        table.set(field.getAnnotation(LuaExportField.class).name(), LuaConvertor.toLua(field.get(o)));
+                    } catch (IllegalAccessException e) {
+                        throw new RuntimeException(e);
+                    }
                 }
-                try {
-                    table.set(field.getAnnotation(LuaExportField.class).name(), LuaConvertor.toLua(field.get(o)));
-                } catch (IllegalAccessException e) {
-                    throw new RuntimeException(e);
-                }
-            }
+
         }
         try {
             value.call(table);

@@ -1,6 +1,5 @@
 package ru.megantcs.enhancer.api.lua;
 
-
 import org.jetbrains.annotations.CheckReturnValue;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.LoggerFactory;

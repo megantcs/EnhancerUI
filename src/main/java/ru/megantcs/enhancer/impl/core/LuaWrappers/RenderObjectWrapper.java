@@ -96,4 +96,15 @@ public class RenderObjectWrapper
 
         return true;
     }
+
+    @LuaExportMethod(name = "drawText")
+    public boolean drawText(float x, float y, boolean shadow, String text, String hex) {
+        if(renderObject == null) return false;
+        if(text == null || hex == null)
+            return false;
+
+        renderObject.drawText(x, y, text, shadow, ColorConvertor.hexToColor(hex));
+
+        return true;
+    }
 }

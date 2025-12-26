@@ -4,6 +4,7 @@ import ru.megantcs.enhancer.api.lua.LuaScriptEngine;
 import ru.megantcs.enhancer.api.lua.toolkit.LuaMethod;
 import ru.megantcs.enhancer.api.lua.toolkit.PosObject;
 import ru.megantcs.enhancer.hook.ScoreboardRenderHook;
+import ru.megantcs.enhancer.hook.data.ScoreboardRenderHookData;
 import ru.megantcs.enhancer.hook.handlers.ScoreboardPosHandler;
 import ru.megantcs.enhancer.platform.toolkit.reflect.FinishedObjects.FinishField;
 
@@ -38,7 +39,7 @@ public class ScoreboardRenderMixin extends LuaMixinModule
         render = null;
     }
 
-    private boolean scoreboard$background(ScoreboardRenderHook.RenderInfo renderInfo) {
+    private boolean scoreboard$background(ScoreboardRenderHookData scoreboardRenderHookData) {
         boolean close = false;
         if(render != null) {
             render.call(new PosObject(
@@ -50,22 +51,22 @@ public class ScoreboardRenderMixin extends LuaMixinModule
             closeOtherRender = true;
         }
         if(background != null) {
-            background.call(renderInfo);
+            background.call(scoreboardRenderHookData);
             close = true;
         }
         return close;
     }
 
-    private boolean scoreboard$header(ScoreboardRenderHook.RenderInfo renderInfo) {
+    private boolean scoreboard$header(ScoreboardRenderHookData scoreboardRenderHookData) {
         if(header == null) return closeOtherRender;
-        header.call(renderInfo);
+        header.call(scoreboardRenderHookData);
 
         return closeOtherRender;
     }
 
-    private boolean scoreboard$separator(ScoreboardRenderHook.RenderInfo renderInfo) {
+    private boolean scoreboard$separator(ScoreboardRenderHookData scoreboardRenderHookData) {
         if(separator == null) return closeOtherRender;
-        separator.call(renderInfo);
+        separator.call(scoreboardRenderHookData);
 
         return true;
     }

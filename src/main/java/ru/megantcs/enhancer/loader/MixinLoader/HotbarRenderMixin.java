@@ -5,6 +5,8 @@ import ru.megantcs.enhancer.api.lua.toolkit.LuaMethod;
 import ru.megantcs.enhancer.api.lua.toolkit.PosObject;
 import ru.megantcs.enhancer.hook.HotBarRenderHook;
 import ru.megantcs.enhancer.hook.ScoreboardRenderHook;
+import ru.megantcs.enhancer.hook.data.HotbarRenderHookData;
+import ru.megantcs.enhancer.hook.data.ScoreboardRenderHookData;
 import ru.megantcs.enhancer.hook.handlers.HotBarPosHandler;
 
 public class HotbarRenderMixin extends LuaMixinModule
@@ -35,12 +37,12 @@ public class HotbarRenderMixin extends LuaMixinModule
         return close;
     }
 
-    private boolean mixin$hotbar$background(ScoreboardRenderHook.RenderInfo renderInfo)
+    private boolean mixin$hotbar$background(HotbarRenderHookData scoreboardRenderHookData)
     {
         boolean close = false;
         if(background != null)
         {
-            background.call(renderInfo);
+            background.call(scoreboardRenderHookData);
             close = true;
         }
         if(render != null)

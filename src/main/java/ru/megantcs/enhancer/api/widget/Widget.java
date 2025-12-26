@@ -428,7 +428,7 @@ public class Widget
     }
 
     protected Brush getCurrentBackgroundColor() {
-        return style.getCurrentBackgroundColor(enabled, hovered, pressed);
+        return style.getCurrentBackgroundColor(enabled, isMouseOver((int) MinecraftClient.getInstance().mouse.getX(), (int) MinecraftClient.getInstance().mouse.getY()), pressed);
     }
 
     protected Brush getCurrentTextColor() {
