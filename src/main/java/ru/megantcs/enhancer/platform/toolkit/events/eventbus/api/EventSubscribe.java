@@ -1,4 +1,4 @@
 package ru.megantcs.enhancer.platform.toolkit.events.eventbus.api;
 
-public class EventBus {
+public @interface EventSubscribe {
 }

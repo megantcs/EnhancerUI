@@ -7,8 +7,8 @@ import ru.megantcs.enhancer.platform.toolkit.api.AccessExceptions;
 public interface EventBusRegister
 {
     @AccessExceptions(access = NullPointerException.class)
-    void register(EventHandler eventHandler);
+    void register(FabricEventHandler eventHandler);
 
     @AccessExceptions(access = NullPointerException.class)
-    boolean unregister(EventHandler eventHandler);
+    boolean unregister(FabricEventHandler eventHandler);
 }

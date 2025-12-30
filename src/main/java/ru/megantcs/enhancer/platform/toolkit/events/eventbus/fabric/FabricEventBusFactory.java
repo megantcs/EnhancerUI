@@ -5,7 +5,7 @@ import ru.megantcs.enhancer.platform.toolkit.events.eventbus.api.IEventBusFactor
 
 public class DefaultEventBusFactory implements IEventBusFactory {
 
-    private static final DefaultEventBusRegister eventBusRegister;
+    private static final FabricEventBusRegister eventBusRegister;
 
     @Override
     public EventBusRegister getBusRegister() {
@@ -13,6 +13,6 @@ public class DefaultEventBusFactory implements IEventBusFactory {
     }
 
     static {
-        eventBusRegister = new DefaultEventBusRegister();
+        eventBusRegister = new FabricEventBusRegister();
     }
 }

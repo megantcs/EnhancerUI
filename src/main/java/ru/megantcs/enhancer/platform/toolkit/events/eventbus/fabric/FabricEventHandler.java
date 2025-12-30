@@ -6,10 +6,11 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 
 // supported interface
-public interface EventHandler
+public interface FabricEventHandler
 {
     default void onGameTick(MinecraftClient minecraftClient) {}
     default void onHudRender(DrawContext drawContext, float delta) {}
-    default void onWorldRender(WorldRenderContext context) {}
+    default void onWorldRenderAfter(WorldRenderContext context) {}
+    default void onWorldRenderBefore(WorldRenderContext context) {}
     default void imguiRender(ImGuiIO io) {}
 }

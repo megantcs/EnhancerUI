@@ -8,9 +8,9 @@ import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import ru.megantcs.enhancer.api.graphics.ImGuiLoader;
-import ru.megantcs.enhancer.platform.toolkit.events.eventbus.api.EventBus;
+import ru.megantcs.enhancer.platform.toolkit.events.eventbus.api.EventSubscribe;
 import ru.megantcs.enhancer.platform.toolkit.events.eventbus.api.EventBusRegister;
-import ru.megantcs.enhancer.platform.toolkit.events.eventbus.api.EventHandler;
+import ru.megantcs.enhancer.platform.toolkit.events.eventbus.api.FabricEventHandler;
 import ru.megantcs.enhancer.platform.toolkit.interfaces.Action;
 
 import java.lang.reflect.Method;
@@ -18,11 +18,11 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-public class DefaultEventBusRegister implements EventBusRegister {
-    private final List<EventHandler> events;
-    private final Map<EventHandler, Set<String>> executedFirstMethods;
+public class FabricEventBusRegister implements EventBusRegister {
+    private final List<FabricEventHandler> events;
+    private final Map<FabricEventHandler, Set<String>> executedFirstMethods;
 
-    public DefaultEventBusRegister() {
+    public FabricEventBusRegister() {
         events = new CopyOnWriteArrayList<>();
         executedFirstMethods = new ConcurrentHashMap<>();
         init();
@@ -31,8 +31,15 @@ public class DefaultEventBusRegister implements EventBusRegister {
     private void init() {
         ClientTickEvents.END_CLIENT_TICK.register(this::executeGameTick);
         HudRenderCallback.EVENT.register(this::executeHudRender);
-        WorldRenderEvents.AFTER_ENTITIES.register(this::executeWorldRender);
+        WorldRenderEvents.AFTER_ENTITIES.register(this::executeWorldRenderAfter);
+        WorldRenderEvents.BEFORE_ENTITIES.register(this::executeWorldRenderBefore);
+
         ImGuiLoader.INSTANCE.RENDER_FRAME_EVENT.register(this::executeImGuiRender);
+    }
+
+    private void executeWorldRenderBefore(WorldRenderContext worldRenderContext) {
+        executeMethod("onWorldRenderBefore", handler -> handler.onWorldRenderBefore(worldRenderContext),
+                WorldRenderEvents.AfterEntities.class);
     }
 
     private void executeGameTick(MinecraftClient mc) {
@@ -44,8 +51,8 @@ public class DefaultEventBusRegister implements EventBusRegister {
                 DrawContext.class, float.class);
     }
 
-    private void executeWorldRender(WorldRenderContext context) {
-        executeMethod("onWorldRender", handler -> handler.onWorldRender(context),
+    private void executeWorldRenderAfter(WorldRenderContext context) {
+        executeMethod("onWorldRenderAfter", handler -> handler.onWorldRenderAfter(context),
                 WorldRenderEvents.AfterEntities.class);
     }
 
@@ -53,13 +60,13 @@ public class DefaultEventBusRegister implements EventBusRegister {
         executeMethod("imguiRender", handler -> handler.imguiRender(io), ImGuiIO.class);
     }
 
-    private void executeMethod(String methodName, Action<EventHandler> action, Class<?>... paramTypes) {
-        for (EventHandler event : events) {
+    private void executeMethod(String methodName, Action<FabricEventHandler> action, Class<?>... paramTypes) {
+        for (FabricEventHandler event : events) {
             try {
                 Method method = event.getClass().getMethod(methodName, paramTypes);
-                EventBus annotation = method.getAnnotation(EventBus.class);
+                EventSubscribe annotation = method.getAnnotation(EventSubscribe.class);
 
-                if (annotation != null && annotation.type() == EventBus.Type.FIRST) {
+                if (annotation != null && annotation.type() == EventSubscribe.Type.FIRST) {
                     Set<String> executedMethods = executedFirstMethods
                             .computeIfAbsent(event, k -> ConcurrentHashMap.newKeySet());
 
@@ -77,18 +84,18 @@ public class DefaultEventBusRegister implements EventBusRegister {
         }
     }
 
-    public void register(EventHandler eventHandler) {
+    public void register(FabricEventHandler eventHandler) {
         Objects.requireNonNull(eventHandler);
         events.add(eventHandler);
     }
 
-    public boolean unregister(EventHandler eventHandler) {
+    public boolean unregister(FabricEventHandler eventHandler) {
         Objects.requireNonNull(eventHandler);
         executedFirstMethods.remove(eventHandler);
         return events.remove(eventHandler);
     }
 
-    public void resetFirstExecution(EventHandler eventHandler) {
+    public void resetFirstExecution(FabricEventHandler eventHandler) {
         Objects.requireNonNull(eventHandler);
         executedFirstMethods.remove(eventHandler);
     }
