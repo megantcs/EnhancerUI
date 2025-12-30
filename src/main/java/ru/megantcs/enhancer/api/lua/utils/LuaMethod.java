@@ -1,14 +1,12 @@
-package ru.megantcs.enhancer.api.lua.toolkit;
+package ru.megantcs.enhancer.api.lua.utils;
 
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 import ru.megantcs.enhancer.api.lua.LuaConvertor;
 import ru.megantcs.enhancer.api.lua.reflect.LuaExportField;
-import ru.megantcs.enhancer.api.lua.reflect.wrappers.FieldWrapper;
 import ru.megantcs.enhancer.platform.toolkit.reflect.AnnotationSearcher;
 
 import java.lang.reflect.Field;
-import java.util.List;
 import java.util.Objects;
 
 public class LuaMethod

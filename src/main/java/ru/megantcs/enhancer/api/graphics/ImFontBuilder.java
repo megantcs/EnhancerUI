@@ -3,12 +3,16 @@ package ru.megantcs.enhancer.api.graphics;
 import imgui.ImFontAtlas;
 import imgui.ImFontConfig;
 import org.slf4j.Logger;
+import ru.megantcs.enhancer.platform.toolkit.debugs.Assert;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 
+@SuppressWarnings("all")
 public class ImFontBuilder
 {
     private final ImFontAtlas atlas;
@@ -20,16 +24,6 @@ public class ImFontBuilder
 
         this.logger = Objects.requireNonNull(logger);
         this.atlas = Objects.requireNonNull(atlas, "atlas");
-    }
-
-    public ImFontBuilder addFontFromFileTTF(String path, int fontSize)
-    {
-        if(!Files.exists(Path.of(path)))
-            throw new RuntimeException("File not found: " + path);
-
-        logger.info("Font loaded: " + path + ", size: " + fontSize);
-        atlas.addFontFromFileTTF(path, fontSize, config);
-        return this;
     }
 
     public ImFontBuilder setMergeMode(boolean value) {
@@ -50,14 +44,51 @@ public class ImFontBuilder
 
     public ImFontBuilder addFontFromFileTTF(String path, int fontSize, short start, short end)
     {
-        if(!Files.exists(Path.of(path)))
-            throw new RuntimeException("File not found: " + path);
+        Assert.throwExistFile(path);
 
         short[] buildBuffer = new short[] {start, end, 0};
-        logger.info("Font loaded: " + path + ", size: " + fontSize + ", fa_start: " + start + ", fa_end: " + end);
 
         atlas.addFontFromFileTTF(path, fontSize, config, buildBuffer);
         return this;
+    }
+
+    public ImFontBuilder addFontFromFileTTF(String path, int fontSize)
+    {
+        Assert.throwExistFile(path);
+
+        atlas.addFontFromFileTTF(path, fontSize, config);
+        return this;
+    }
+
+    public ImFontBuilder addFontFromResourceTTF(Class<?> sender, String resourcePath, int fontSize, short start, short end) {
+        try {
+            InputStream fontStream = Assert.throwExistResource(sender, resourcePath);
+
+            byte[] fontData = fontStream.readAllBytes();
+            fontStream.close();
+
+            short[] glyphRanges = new short[] {start, end, 0};
+            atlas.addFontFromMemoryTTF(fontData, fontSize, config, glyphRanges);
+
+            return this;
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load font from resource: " + resourcePath, e);
+        }
+    }
+
+    public ImFontBuilder addFontFromResourceTTF(Class<?> sender, String resourcePath, int fontSize) {
+        try {
+            InputStream fontStream = Assert.throwExistResource(sender, resourcePath);
+
+            byte[] fontData = fontStream.readAllBytes();
+            fontStream.close();
+
+            atlas.addFontFromMemoryTTF(fontData, fontSize, config);
+
+            return this;
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load font from resource: " + resourcePath, e);
+        }
     }
 
     public ImFontBuilder build() {

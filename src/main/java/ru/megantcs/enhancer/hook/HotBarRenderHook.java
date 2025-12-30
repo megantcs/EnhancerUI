@@ -1,6 +1,6 @@
 package ru.megantcs.enhancer.hook;
 
-import ru.megantcs.enhancer.api.lua.toolkit.PosObject;
+import ru.megantcs.enhancer.api.lua.utils.PosObject;
 import ru.megantcs.enhancer.hook.data.HotbarRenderHookData;
 import ru.megantcs.enhancer.platform.toolkit.events.EventFactory;
 import ru.megantcs.enhancer.platform.toolkit.events.impl.FuncEvent;

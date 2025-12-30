@@ -7,6 +7,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 
+/**
+ * when UpdateValue is called, the file.
+ * implementation re-reads the file in hopes of an update.
+ */
 public class FileChunk extends Chunk
 {
     @NotNull

@@ -8,8 +8,14 @@ import ru.megantcs.enhancer.api.lua.wrappers.*;
 import ru.megantcs.enhancer.api.provider.SystemPlaceholderProvider;
 import ru.megantcs.enhancer.impl.core.LuaWrappers.RenderObjectSingleton;
 import ru.megantcs.enhancer.impl.core.LuaWrappers.RenderObjectWrapper;
+import ru.megantcs.enhancer.loader.MixinLoader.CrosshairRenderMixin;
+import ru.megantcs.enhancer.loader.MixinLoader.HotbarRenderMixin;
+import ru.megantcs.enhancer.loader.MixinLoader.LuaMixinHub;
+import ru.megantcs.enhancer.loader.MixinLoader.ScoreboardRenderMixin;
 import ru.megantcs.enhancer.platform.toolkit.events.eventbus.EventBusFactory;
+import ru.megantcs.enhancer.platform.toolkit.events.eventbus.api.EventBus;
 import ru.megantcs.enhancer.platform.toolkit.events.eventbus.api.EventBusRegister;
+import ru.megantcs.enhancer.platform.toolkit.events.eventbus.impl.DefaultEventBus;
 import ru.megantcs.enhancer.platform.toolkit.placeholders.api.Placeholder;
 import ru.megantcs.enhancer.platform.toolkit.placeholders.api.PlaceholderFactory;
 import ru.megantcs.enhancer.platform.toolkit.api.API;
@@ -20,6 +26,7 @@ import java.lang.reflect.InvocationTargetException;
 public class EnhancerPlatform
 {
     private static final EventBusRegister PLATFORM_BUS_REGISTER;
+    private static final EventBus PLATFORM_EVENT_BUS;
     private static final Placeholder BASE_PLACEHOLDER;
     private static final Placeholder PLATFORM_PLACEHOLDER;
 
@@ -42,8 +49,12 @@ public class EnhancerPlatform
     }
 
     @API(status = API.Status.MAINTAINED)
-    public static EventBusRegister platformEventBus() {
+    public static EventBusRegister platformFabricEventBus() {
         return PLATFORM_BUS_REGISTER;
+    }
+
+    public static EventBus platformEventBus() {
+        return PLATFORM_EVENT_BUS;
     }
 
     @API(status = API.Status.MAINTAINED)
@@ -57,11 +68,22 @@ public class EnhancerPlatform
     }
 
     static {
-        PLATFORM_BUS_REGISTER = EventBusFactory.getInstance();
+        PLATFORM_BUS_REGISTER = EventBusFactory.getInstanceFabricEvent();
         BASE_PLACEHOLDER = PlaceholderFactory.create("{", "}");
+        PLATFORM_EVENT_BUS = EventBusFactory.getEventBus();
         PLATFORM_PLACEHOLDER = new PartPipeline<Placeholder>(BASE_PLACEHOLDER)
                 .part(new SystemPlaceholderProvider(BASE_PLACEHOLDER))
                 .part(new PlayerInfoPlaceholderProvider(PLATFORM_BUS_REGISTER, BASE_PLACEHOLDER)).get();
+    }
+
+    public static LuaMixinHub platformMixinHub()
+    {
+        var hub = new LuaMixinHub(supportEnhancerSandbox());
+        hub.addModule(new HotbarRenderMixin());
+        hub.addModule(new ScoreboardRenderMixin());
+        hub.addModule(new CrosshairRenderMixin());
+
+        return hub;
     }
 }
 

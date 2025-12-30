@@ -1,4 +1,10 @@
 package ru.megantcs.enhancer.platform.toolkit.reflect;
 
-public @interface FinializeField {
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
+@Retention(RetentionPolicy.RUNTIME)
+public @interface FinalizeField
+{
+
 }

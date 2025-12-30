@@ -1,9 +1,9 @@
-package ru.megantcs.enhancer.platform.toolkit.events.eventbus.impl;
+package ru.megantcs.enhancer.platform.toolkit.events.eventbus.fabric;
 
 import ru.megantcs.enhancer.platform.toolkit.events.eventbus.api.EventBusRegister;
 import ru.megantcs.enhancer.platform.toolkit.events.eventbus.api.IEventBusFactory;
 
-public class DefaultEventBusFactory implements IEventBusFactory {
+public class FabricEventBusFactory implements IEventBusFactory {
 
     private static final FabricEventBusRegister eventBusRegister;
 

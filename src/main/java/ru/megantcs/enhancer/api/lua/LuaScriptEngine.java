@@ -6,6 +6,7 @@ import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.jse.JsePlatform;
+import ru.megantcs.enhancer.platform.toolkit.Warnings;
 import ru.megantcs.enhancer.platform.toolkit.exceptions.container.api.ExceptionContainer;
 
 import java.util.Objects;
@@ -20,6 +21,7 @@ public class LuaScriptEngine
         reloadEnvironment();
     }
 
+    @SuppressWarnings(Warnings.unusedReturnValue)
     public boolean setTable(@Nullable String name, @Nullable LuaTable table)
     {
         if(name == null || table == null) return false;

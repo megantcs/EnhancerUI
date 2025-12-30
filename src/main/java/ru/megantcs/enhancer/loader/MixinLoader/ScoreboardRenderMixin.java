@@ -1,19 +1,19 @@
 package ru.megantcs.enhancer.loader.MixinLoader;
 
 import ru.megantcs.enhancer.api.lua.LuaScriptEngine;
-import ru.megantcs.enhancer.api.lua.toolkit.LuaMethod;
-import ru.megantcs.enhancer.api.lua.toolkit.PosObject;
+import ru.megantcs.enhancer.api.lua.utils.LuaMethod;
+import ru.megantcs.enhancer.api.lua.utils.PosObject;
 import ru.megantcs.enhancer.hook.ScoreboardRenderHook;
 import ru.megantcs.enhancer.hook.data.ScoreboardRenderHookData;
 import ru.megantcs.enhancer.hook.handlers.ScoreboardPosHandler;
-import ru.megantcs.enhancer.platform.toolkit.reflect.FinishedObjects.FinishField;
+import ru.megantcs.enhancer.platform.toolkit.reflect.FinalizeField;
 
 public class ScoreboardRenderMixin extends LuaMixinModule
 {
-    @FinishField private LuaMethod background;
-    @FinishField private LuaMethod header;
-    @FinishField private LuaMethod separator;
-    @FinishField private LuaMethod render;
+    @FinalizeField private LuaMethod background;
+    @FinalizeField private LuaMethod header;
+    @FinalizeField private LuaMethod separator;
+    @FinalizeField private LuaMethod render;
 
     private LuaScriptEngine sandbox;
     private boolean closeOtherRender = false;

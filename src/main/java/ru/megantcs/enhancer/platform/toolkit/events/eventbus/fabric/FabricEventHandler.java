@@ -1,4 +1,4 @@
-package ru.megantcs.enhancer.platform.toolkit.events.eventbus.api;
+package ru.megantcs.enhancer.platform.toolkit.events.eventbus.fabric;
 
 import imgui.ImGuiIO;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;

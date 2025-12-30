@@ -1,10 +1,10 @@
-package ru.megantcs.enhancer.platform.toolkit.events.eventbus.api;
+package ru.megantcs.enhancer.platform.toolkit.events.eventbus.fabric;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 @Retention(RetentionPolicy.RUNTIME)
-public @interface EventSubscribe
+public @interface FabricEventSubscribe
 {
     Type type() default Type.ALWAYS;
 

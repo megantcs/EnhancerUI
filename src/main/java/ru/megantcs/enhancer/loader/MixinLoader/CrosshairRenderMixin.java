@@ -1,8 +1,8 @@
 package ru.megantcs.enhancer.loader.MixinLoader;
 
 import ru.megantcs.enhancer.api.lua.LuaScriptEngine;
-import ru.megantcs.enhancer.api.lua.toolkit.LuaMethod;
-import ru.megantcs.enhancer.api.lua.toolkit.PosObject;
+import ru.megantcs.enhancer.api.lua.utils.LuaMethod;
+import ru.megantcs.enhancer.api.lua.utils.PosObject;
 import ru.megantcs.enhancer.hook.CrosshairRenderHook;
 import ru.megantcs.enhancer.hook.data.CrosshairRenderHookData;
 

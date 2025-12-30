@@ -15,7 +15,7 @@ public class DefaultStyle extends Style
         this.borderColor = new Brush(new Color(90, 90, 90, 220));
         this.hoverColor = new Brush(new Color(65, 65, 65, 220));
         this.pressedColor = new Brush(new Color(75, 75, 75, 220));
-        this.cornerRadius = 4f;
+        this.cornerRadius = 0f;
         this.borderWidth = 1.5f;
         try {
             this.font = GraphicsUtils.createFontFromResourceTTF(16,"mc");
@@ -28,7 +28,6 @@ public class DefaultStyle extends Style
     public void drawRect(RenderObject renderObject, float x, float y, float z, float width, float height, Brush brush)
     {
         renderObject.drawRect(x, y, z, width, height, cornerRadius, 1, brush);
-        renderObject.drawGlow(x, y, z - 1, width, height, cornerRadius, brush);
     }
 
     @Override

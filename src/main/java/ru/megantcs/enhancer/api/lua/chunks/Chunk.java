@@ -8,6 +8,12 @@ import ru.megantcs.enhancer.platform.toolkit.api.Noexcept;
 import java.io.IOException;
 import java.util.Objects;
 
+/**
+ * an abstract chunk class that can update its value.
+ * The chunk update is used when LuaSandBox is restarted
+ * @see ru.megantcs.enhancer.api.lua.LuaSandBox
+ */
+@SuppressWarnings("all")
 public abstract class Chunk
 {
     @NotNull private String code;

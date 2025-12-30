@@ -5,11 +5,11 @@ import net.minecraft.client.MinecraftClient;
 import ru.megantcs.enhancer.platform.toolkit.events.eventbus.api.EventBusRegister;
 import ru.megantcs.enhancer.platform.toolkit.interfaces.Returnable;
 import ru.megantcs.enhancer.platform.toolkit.placeholders.api.Placeholder;
-import ru.megantcs.enhancer.platform.toolkit.events.eventbus.api.EventHandler;
+import ru.megantcs.enhancer.platform.toolkit.events.eventbus.fabric.FabricEventHandler;
 
 import java.util.Objects;
 
-public class PlayerInfoPlaceholderProvider implements EventHandler, Returnable<Placeholder>
+public class PlayerInfoPlaceholderProvider implements FabricEventHandler, Returnable<Placeholder>
 {
     private final Placeholder placeholder;
 

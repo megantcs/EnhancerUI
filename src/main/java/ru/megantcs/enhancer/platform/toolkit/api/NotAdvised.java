@@ -1,4 +1,6 @@
 package ru.megantcs.enhancer.platform.toolkit.api;
 
-public @interface NotAdvised {
+public @interface NotAdvised
+{
+    String[] value();
 }

@@ -1,4 +1,4 @@
-package ru.megantcs.enhancer.platform.toolkit.events.eventbus.impl;
+package ru.megantcs.enhancer.platform.toolkit.events.eventbus.fabric;
 
 import imgui.ImGuiIO;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -8,9 +8,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import ru.megantcs.enhancer.api.graphics.ImGuiLoader;
-import ru.megantcs.enhancer.platform.toolkit.events.eventbus.api.EventSubscribe;
 import ru.megantcs.enhancer.platform.toolkit.events.eventbus.api.EventBusRegister;
-import ru.megantcs.enhancer.platform.toolkit.events.eventbus.api.FabricEventHandler;
 import ru.megantcs.enhancer.platform.toolkit.interfaces.Action;
 
 import java.lang.reflect.Method;
@@ -64,9 +62,9 @@ public class FabricEventBusRegister implements EventBusRegister {
         for (FabricEventHandler event : events) {
             try {
                 Method method = event.getClass().getMethod(methodName, paramTypes);
-                EventSubscribe annotation = method.getAnnotation(EventSubscribe.class);
+                FabricEventSubscribe annotation = method.getAnnotation(FabricEventSubscribe.class);
 
-                if (annotation != null && annotation.type() == EventSubscribe.Type.FIRST) {
+                if (annotation != null && annotation.type() == FabricEventSubscribe.Type.FIRST) {
                     Set<String> executedMethods = executedFirstMethods
                             .computeIfAbsent(event, k -> ConcurrentHashMap.newKeySet());
 

@@ -27,6 +27,10 @@ public class LuaSandBox
     private final List<ModuleLoadData> modules;
     private final LuaScriptEngine environment;
 
+    private static final String FILE_CHUNK_KEY = "file#chuk";
+    private static final String SCRIPT_CHUNK_KEY = "script#chuk";
+
+
     final ExceptionContainer exceptionContainer;
 
     public final RunnableEvent OnChunkLoaded = EventFactory.makeRunnableEvent();
@@ -141,7 +145,7 @@ public class LuaSandBox
         Objects.requireNonNull(data);
         if(moduleIsLoaded(data)) return false;
 
-        LoggerFactory.getLogger("addModuleData").warn(data.instance.toString());
+        LoggerFactory.getLogger("LuaSandBox").info("module register: {}",data.instance.toString());
         return modules.add(data);
     }
 
@@ -151,8 +155,6 @@ public class LuaSandBox
 
         return obj;
     }
-
-
 
     public boolean loadClass(Object instance)
     {
@@ -186,7 +188,7 @@ public class LuaSandBox
         Objects.requireNonNull(code);
         Objects.requireNonNull(name);
 
-        var newChunk = new CodeChunk(code, unique("script#chunk",name));
+        var newChunk = new CodeChunk(code, unique(SCRIPT_CHUNK_KEY, name));
         return loadChunk(newChunk);
     }
 
@@ -199,7 +201,7 @@ public class LuaSandBox
             return false;
         }
 
-        var newChunk = new FileChunk("(null)", unique("file#chunk", path.getFileName().toString()), fileName);
+        var newChunk = new FileChunk("(null)", unique(FILE_CHUNK_KEY, path.getFileName().toString()), fileName);
         return loadChunk(newChunk);
     }
 

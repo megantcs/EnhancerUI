@@ -1,4 +1,4 @@
-package ru.megantcs.enhancer.api.lua.toolkit;
+package ru.megantcs.enhancer.api.lua.utils;
 
 import ru.megantcs.enhancer.api.lua.reflect.LuaExportField;
 

@@ -2,18 +2,12 @@ package ru.megantcs.enhancer.mixin;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.ibm.icu.impl.coll.CollationSettings;
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
 import net.minecraft.client.option.AttackIndicator;
-import net.minecraft.client.option.GameOptions;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.scoreboard.Scoreboard;
@@ -25,8 +19,6 @@ import net.minecraft.util.Arm;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.RotationAxis;
-import net.minecraft.world.GameMode;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -34,7 +26,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import ru.megantcs.enhancer.api.lua.toolkit.PosObject;
+import ru.megantcs.enhancer.api.lua.utils.PosObject;
 import ru.megantcs.enhancer.hook.CrosshairRenderHook;
 import ru.megantcs.enhancer.hook.HotBarRenderHook;
 import ru.megantcs.enhancer.hook.ScoreboardRenderHook;
@@ -80,50 +72,6 @@ public abstract class InGameHudMixin
         if(cancel) {
             callbackInfo.cancel();
             return;
-        }
-        GameOptions gameOptions = this.client.options;
-        if (gameOptions.getPerspective().isFirstPerson()) {
-            if (this.client.interactionManager.getCurrentGameMode() != GameMode.SPECTATOR || this.shouldRenderSpectatorCrosshair(this.client.crosshairTarget)) {
-                if (gameOptions.debugEnabled && !gameOptions.hudHidden && !this.client.player.hasReducedDebugInfo() && !(Boolean)gameOptions.getReducedDebugInfo().getValue()) {
-                    Camera camera = this.client.gameRenderer.getCamera();
-                    MatrixStack matrixStack = RenderSystem.getModelViewStack();
-                    matrixStack.push();
-                    matrixStack.multiplyPositionMatrix(context.getMatrices().peek().getPositionMatrix());
-                    matrixStack.translate((float)(this.scaledWidth / 2), (float)(this.scaledHeight / 2), 0.0F);
-                    matrixStack.multiply(RotationAxis.NEGATIVE_X.rotationDegrees(camera.getPitch()));
-                    matrixStack.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(camera.getYaw()));
-                    matrixStack.scale(-1.0F, -1.0F, -1.0F);
-                    RenderSystem.applyModelViewMatrix();
-                    RenderSystem.renderCrosshair(10);
-                    matrixStack.pop();
-                    RenderSystem.applyModelViewMatrix();
-                } else {
-                    RenderSystem.blendFuncSeparate(GlStateManager.SrcFactor.ONE_MINUS_DST_COLOR, GlStateManager.DstFactor.ONE_MINUS_SRC_COLOR, GlStateManager.SrcFactor.ONE, GlStateManager.DstFactor.ZERO);
-                    int i = 15;
-                        context.drawTexture(ICONS, (this.scaledWidth - 15) / 2, (this.scaledHeight - 15) / 2, 0, 0, 15, 15);
-
-                        if (this.client.options.getAttackIndicator().getValue() == AttackIndicator.CROSSHAIR) {
-                            float f = this.client.player.getAttackCooldownProgress(0.0F);
-                            boolean bl = false;
-                            if (this.client.targetedEntity != null && this.client.targetedEntity instanceof LivingEntity && f >= 1.0F) {
-                                bl = this.client.player.getAttackCooldownProgressPerTick() > 5.0F;
-                                bl &= this.client.targetedEntity.isAlive();
-                            }
-
-                            int j = this.scaledHeight / 2 - 7 + 16;
-                            int k = this.scaledWidth / 2 - 8;
-                            if (bl) {
-                                context.drawTexture(ICONS, k, j, 68, 94, 16, 16);
-                            } else if (f < 1.0F) {
-                                int l = (int) (f * 17.0F);
-                                context.drawTexture(ICONS, k, j, 36, 94, 16, 4);
-                                context.drawTexture(ICONS, k, j, 52, 94, l, 4);
-                            }
-                        }
-
-                        RenderSystem.defaultBlendFunc();
-                    }
-                }
         }
     }
 

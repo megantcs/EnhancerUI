@@ -1,7 +1,7 @@
 package ru.megantcs.enhancer.platform.toolkit.exceptions;
 
-public class MissingMethodLeghtParams extends RuntimeException {
-  public MissingMethodLeghtParams(String message) {
-    super(message);
-  }
+public class IncorrectMethodParamsLength extends RuntimeException {
+    public IncorrectMethodParamsLength(String message) {
+        super(message);
+    }
 }

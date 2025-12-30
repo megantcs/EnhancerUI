@@ -76,6 +76,21 @@ public class Brush
         if(!isAvailable(i)) throw new IndexOutOfBoundsException("!isAvailable(" + i + ")");
     }
 
+    public Brush brighter() {
+        throwIsEmpty();
+        colors.forEach(Color::brighter);
+
+        return this;
+    }
+
+    public Brush brighter(int i) {
+        throwIsEmpty();
+
+        for (int j = 0; j < i; j++) {
+            brighter();
+        }
+        return this;
+    }
 
     public Color first() {
         throwIsEmpty();
